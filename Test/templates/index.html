@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeKnight</title>
+  <meta name="description" content="Learn Python by fighting dungeon monsters! An educational RPG coding game." />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body class="menu-page">
+  <div class="stars" id="stars"></div>
+
+  <div class="menu-wrap">
+    <!-- TITLE SECTION -->
+    <div class="title-block">
+      <div class="swords-icon">⚔️</div>
+      <h1 class="pixel-title">CODE<br />KNIGHT</h1>
+      <p class="pixel-sub">" solve python · slay dungeons "</p>
+    </div>
+
+    <!-- MAIN MENU BUTTONS -->
+    <div class="main-menu-btns" id="mainMenu">
+      <button class="sk-btn sk-btn-gold" id="btnNewGame" onclick="showModeSelect()">
+        ▶ New Game
+      </button>
+      <button class="sk-btn sk-btn-outline" id="btnHowTo" onclick="showHowTo()">
+        ▶ How to Play
+      </button>
+    </div>
+
+    <!-- HOW TO PLAY PANEL -->
+    <div class="sk-panel hidden" id="howtoPanel">
+      <h2 class="panel-title">— HOW TO PLAY —</h2>
+      <ul class="howto-list">
+        <li>⚔️ Choose your hero class</li>
+        <li>🏰 Enter the dungeon stages</li>
+        <li>🐍 A Python coding challenge appears</li>
+        <li>✅ Correct code → Hero attacks the enemy</li>
+        <li>❌ Wrong code → Enemy strikes back!</li>
+        <li>⏰ Time runs out → Enemy auto-attacks</li>
+        <li>🏆 Defeat all enemies to advance</li>
+      </ul>
+      <div class="panel-btns">
+        <button class="sk-btn sk-btn-outline" onclick="hideHowTo()">◀ Back</button>
+      </div>
+    </div>
+
+    <!-- MODE SELECTION PANEL -->
+    <div class="sk-panel hidden" id="modePanel">
+      <h2 class="panel-title">— CHOOSE MODE —</h2>
+      <div class="mode-container">
+        <div class="mode-image">
+          <img src="/static/image/Characters/Knight_1.webp" alt="Knight Mode" class="pixel-img hero-card-img"
+            style="height: 300px;" />
+        </div>
+        <div class="mode-options">
+          <div class="mode-option" id="mode-easy" onclick="selectMode('easy')">EASY</div>
+          <div class="mode-option" id="mode-normal" onclick="selectMode('normal')">NORMAL</div>
+          <div class="mode-option" id="mode-expert" onclick="selectMode('expert')">EXPERT</div>
+          <div class="mode-option" id="mode-insane" onclick="selectMode('insane')">INSANE</div>
+        </div>
+      </div>
+      <div class="panel-btns">
+        <button class="sk-btn sk-btn-outline" onclick="backToMainFromMode()">◀ Back</button>
+        <button class="sk-btn sk-btn-gold" id="btnNextMode" onclick="showHeroSelect()" disabled>▶ Next</button>
+      </div>
+    </div>
+
+    <!-- HERO SELECTION PANEL -->
+    <div class="sk-panel hidden" id="heroPanel">
+      <h2 class="panel-title">— CHOOSE YOUR HERO —</h2>
+      <div class="hero-cards">
+        <!-- Knight -->
+        <div class="hero-card" id="card-knight" onclick="selectHero('knight')">
+          <img src="/static/image/Characters/Knight.png" alt="Knight" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">KNIGHT</div>
+          <div class="hero-card-desc">High HP · Bonus time</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar">
+              <div class="stat-fill hp-fill" style="width:90%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar">
+              <div class="stat-fill atk-fill" style="width:65%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar">
+              <div class="stat-fill spd-fill" style="width:50%"></div>
+            </div>
+          </div>
+        </div>
+        <!-- NightBorne removed -->
+        <!-- Fish Mage removed -->
+        <!-- Pistol Rogue -->
+        <div class="hero-card" id="card-rogue" onclick="selectHero('rogue')">
+          <img src="/static/image/Characters/Knight.png" alt="Rogue" class="hero-card-img pixel-img rogue-tint" />
+          <div class="hero-card-name">ROGUE</div>
+          <div class="hero-card-desc">Criticals · Lethal speed</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar">
+              <div class="stat-fill hp-fill" style="width:65%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar">
+              <div class="stat-fill atk-fill" style="width:75%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar">
+              <div class="stat-fill spd-fill" style="width:95%"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Elite Knight -->
+        <div class="hero-card" id="card-knight2" onclick="selectHero('knight2')">
+          <img src="/static/image/Characters/Knight_1.webp" alt="Elite Knight" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">ELITE KNIGHT</div>
+          <div class="hero-card-desc">Balanced · Extra Hint</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar">
+              <div class="stat-fill hp-fill" style="width:85%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar">
+              <div class="stat-fill atk-fill" style="width:80%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar">
+              <div class="stat-fill spd-fill" style="width:65%"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Fire Knight -->
+        <div class="hero-card" id="card-fireknight" onclick="selectHero('fireknight')">
+          <img src="/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/01_idle/idle_1.png" alt="Fire Knight" class="hero-card-img pixel-img" style="transform: scale(2);" />
+          <div class="hero-card-name">FIRE KNIGHT</div>
+          <div class="hero-card-desc">Blazing Speed · High ATK</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar">
+              <div class="stat-fill hp-fill" style="width:75%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar">
+              <div class="stat-fill atk-fill" style="width:95%"></div>
+            </div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar">
+              <div class="stat-fill spd-fill" style="width:85%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-btns">
+        <button class="sk-btn sk-btn-outline" onclick="backToModeSelect()">◀ Back</button>
+        <button class="sk-btn sk-btn-gold" id="btnEnterDungeon" onclick="enterDungeon()" disabled>▶ Enter
+          Dungeon</button>
+      </div>
+    </div>
+
+    <p class="version-tag">v1.0 · Python Challenge RPG</p>
+  </div>
+
+  <script>
+    // Starfield
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * 100 + 'vh';
+      s.style.animationDelay = (Math.random() * 5) + 's';
+      s.style.width = s.style.height = (1 + Math.random() * 2) + 'px';
+      s.style.opacity = 0.2 + Math.random() * 0.6;
+      starsEl.appendChild(s);
+    }
+
+    let selectedHero = null;
+    let selectedMode = null;
+
+    function showModeSelect() {
+      document.getElementById('mainMenu').classList.add('hidden');
+      document.getElementById('modePanel').classList.remove('hidden');
+      document.getElementById('howtoPanel').classList.add('hidden');
+      document.getElementById('heroPanel').classList.add('hidden');
+    }
+
+    function showHeroSelect() {
+      if (!selectedMode) return;
+      document.getElementById('modePanel').classList.add('hidden');
+      document.getElementById('heroPanel').classList.remove('hidden');
+    }
+    function showHowTo() {
+      document.getElementById('mainMenu').classList.add('hidden');
+      document.getElementById('howtoPanel').classList.remove('hidden');
+    }
+    function hideHowTo() {
+      document.getElementById('howtoPanel').classList.add('hidden');
+      document.getElementById('mainMenu').classList.remove('hidden');
+    }
+    function backToMainFromMode() {
+      document.getElementById('modePanel').classList.add('hidden');
+      document.getElementById('mainMenu').classList.remove('hidden');
+    }
+    function backToModeSelect() {
+      document.getElementById('heroPanel').classList.add('hidden');
+      document.getElementById('modePanel').classList.remove('hidden');
+    }
+    function selectMode(mode) {
+      selectedMode = mode;
+      document.querySelectorAll('.mode-option').forEach(c => c.classList.remove('selected'));
+      document.getElementById('mode-' + mode).classList.add('selected');
+      document.getElementById('btnNextMode').disabled = false;
+    }
+    function selectHero(hero) {
+      selectedHero = hero;
+      document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('card-' + hero).classList.add('selected');
+      document.getElementById('btnEnterDungeon').disabled = false;
+      localStorage.setItem('hero', hero);
+    }
+    function enterDungeon() {
+      if (!selectedHero || !selectedMode) return;
+      localStorage.setItem('difficulty', selectedMode);
+      window.location.href = '/battle';
+    }
+  </script>
+</body>
+
+</html>

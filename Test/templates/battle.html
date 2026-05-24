@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Battle – Python Dungeon Quest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body class="battle-page">
+
+  <!-- HUD -->
+  <header class="hud">
+    <div class="hud-left">
+      <a href="/" class="back-btn" id="btn-back-home">🏠</a>
+      <div class="hud-hero-info">
+        <span class="hud-label" id="heroName">KNIGHT</span>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar" id="heroHpBar"></div>
+        </div>
+        <span class="hp-text" id="heroHpText">100/100</span>
+      </div>
+    </div>
+    <div class="hud-center">
+      <span class="stage-label" id="stageLabel">STAGE 1</span>
+      <div class="exp-bar-wrap"><div class="exp-bar" id="expBar"></div></div>
+      <span class="exp-text" id="expText">EXP: 0/100</span>
+    </div>
+    <div class="hud-right">
+      <div class="hud-hero-info">
+        <span class="hud-label" id="enemyName">ENEMY</span>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar enemy-hp-bar" id="enemyHpBar"></div>
+        </div>
+        <span class="hp-text" id="enemyHpText">60/60</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ARENA -->
+  <section class="arena" id="arena">
+    <canvas id="gameCanvas"></canvas>
+    <img id="heroDomSprite" class="hero-dom-sprite hidden" src="" alt="Hero">
+    <div class="combat-layer" id="combatLayer"></div>
+    <div class="screen-flash" id="screenFlash"></div>
+    <div class="bullet-time-overlay hidden" id="bulletTimeOverlay">
+      <div class="bt-text">BULLET TIME</div>
+    </div>
+
+    <!-- Stage Clear -->
+    <div class="stage-clear-overlay hidden" id="stageClearOverlay">
+      <div class="stage-clear-box">
+        <div class="clear-icon">🏆</div>
+        <h2>STAGE CLEAR!</h2>
+        <p id="clearExpText">+30 EXP earned!</p>
+        <button class="sk-btn sk-btn-gold" id="btn-next-stage">▶ Next Stage</button>
+      </div>
+    </div>
+
+    <!-- Game Over -->
+    <div class="game-over-overlay hidden" id="gameOverOverlay">
+      <div class="game-over-box">
+        <div class="go-icon">💀</div>
+        <h2>GAME OVER</h2>
+        <p>The dungeon has claimed you…</p>
+        <button class="sk-btn sk-btn-gold" id="btn-restart" style="margin-top:0.5rem">🔄 Try Again</button>
+        <a href="/" class="sk-btn sk-btn-outline" id="btn-menu">🏠 Main Menu</a>
+      </div>
+    </div>
+
+    <!-- Victory -->
+    <div class="victory-overlay hidden" id="victoryOverlay">
+      <div class="victory-box">
+        <div class="v-icon">🌟</div>
+        <h2>VICTORY!</h2>
+        <p>You conquered the dungeon!</p>
+        <p id="victoryStats" style="color:#a78bfa;margin-top:0.3rem"></p>
+        <a href="/" class="sk-btn sk-btn-gold" id="btn-victory-menu" style="margin-top:0.5rem">🏠 Main Menu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BATTLE PANEL -->
+  <section class="battle-panel" id="battlePanel">
+
+    <div class="challenge-header">
+      <div class="challenge-meta">
+        <span class="diff-badge" id="diffBadge">BEGINNER</span>
+        <span class="enemy-badge" id="enemyBadge">vs ENEMY</span>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-ring" id="timerRing">
+          <svg viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" class="ring-bg"/>
+            <circle cx="20" cy="20" r="16" class="ring-fg" id="timerArc"
+              stroke-dasharray="100.5" stroke-dashoffset="0"/>
+          </svg>
+          <span class="timer-text" id="timerText">30</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-box" id="questionBox">
+      <p id="questionText">Loading challenge…</p>
+      <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 Hint</button>
+      <div class="hint-box hidden" id="hintBox"></div>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-header">
+        <span class="editor-lang">🐍 Python</span>
+        <button class="clear-code-btn" onclick="clearCode()">🗑️ Clear</button>
+      </div>
+      <textarea id="codeEditor" class="code-editor" spellcheck="false"
+        placeholder="# Write your Python code here…"></textarea>
+    </div>
+
+    <div class="panel-actions">
+      <button class="action-btn btn-submit" id="btn-submit" onclick="submitCode()">⚔️ Attack!</button>
+      <button class="action-btn btn-skip"   id="btn-skip"   onclick="skipQuestion()">🛡️ Defend</button>
+    </div>
+
+    <div class="result-box hidden" id="resultBox">
+      <div class="result-icon" id="resultIcon"></div>
+      <p class="result-msg" id="resultMsg"></p>
+      <pre class="result-output" id="resultOutput"></pre>
+    </div>
+
+  </section>
+
+  <script src="/static/js/battle.js"></script>
+</body>
+</html>
