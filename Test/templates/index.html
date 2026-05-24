@@ -51,22 +51,79 @@
 
     <!-- MODE SELECTION PANEL -->
     <div class="sk-panel hidden" id="modePanel">
-      <h2 class="panel-title">— CHOOSE MODE —</h2>
-      <div class="mode-container">
-        <div class="mode-image">
-          <img src="/static/image/Characters/Knight_1.webp" alt="Knight Mode" class="pixel-img hero-card-img"
-            style="height: 300px;" />
+      <h2 class="panel-title">— CHOOSE DIFFICULTY —</h2>
+      <div class="mode-panel-layout">
+
+        <!-- Knight image on the left -->
+        <div class="mode-knight-col">
+          <div class="mode-knight-glow"></div>
+          <img src="/static/image/Characters/Knight_1.webp" alt="Knight" class="mode-knight-img pixel-img" />
+          <div class="mode-knight-label">CHOOSE YOUR PATH</div>
         </div>
-        <div class="mode-options">
-          <div class="mode-option" id="mode-easy" onclick="selectMode('easy')">EASY</div>
-          <div class="mode-option" id="mode-normal" onclick="selectMode('normal')">NORMAL</div>
-          <div class="mode-option" id="mode-expert" onclick="selectMode('expert')">EXPERT</div>
-          <div class="mode-option" id="mode-insane" onclick="selectMode('insane')">INSANE</div>
+
+        <!-- Difficulty cards on the right -->
+        <div class="mode-cards-col">
+          <div class="diff-cards-grid">
+
+            <div class="diff-card diff-card-easy" id="mode-easy" onclick="selectMode('easy')">
+              <div class="diff-card-glow"></div>
+              <div class="diff-card-icon">🌿</div>
+              <div class="diff-card-label">EASY</div>
+              <div class="diff-card-tag">Beginner</div>
+              <ul class="diff-card-perks">
+                <li>⏱ 60s per challenge</li>
+                <li>💡 3 hints available</li>
+                <li>❤️ No HP penalty on skip</li>
+              </ul>
+              <div class="diff-card-check" id="check-easy">✔</div>
+            </div>
+
+            <div class="diff-card diff-card-normal" id="mode-normal" onclick="selectMode('normal')">
+              <div class="diff-card-glow"></div>
+              <div class="diff-card-icon">⚔️</div>
+              <div class="diff-card-label">NORMAL</div>
+              <div class="diff-card-tag">Adventurer</div>
+              <ul class="diff-card-perks">
+                <li>⏱ 45s per challenge</li>
+                <li>💡 1 hint available</li>
+                <li>❤️ Skip costs 10 HP</li>
+              </ul>
+              <div class="diff-card-check" id="check-normal">✔</div>
+            </div>
+
+            <div class="diff-card diff-card-expert" id="mode-expert" onclick="selectMode('expert')">
+              <div class="diff-card-glow"></div>
+              <div class="diff-card-icon">🔥</div>
+              <div class="diff-card-label">EXPERT</div>
+              <div class="diff-card-tag">Veteran</div>
+              <ul class="diff-card-perks">
+                <li>⏱ 30s per challenge</li>
+                <li>💡 No hints</li>
+                <li>❤️ Skip costs 25 HP</li>
+              </ul>
+              <div class="diff-card-check" id="check-expert">✔</div>
+            </div>
+
+            <div class="diff-card diff-card-insane" id="mode-insane" onclick="selectMode('insane')">
+              <div class="diff-card-glow"></div>
+              <div class="diff-card-icon">💀</div>
+              <div class="diff-card-label">INSANE</div>
+              <div class="diff-card-tag">Legendary</div>
+              <ul class="diff-card-perks">
+                <li>⏱ 15s per challenge</li>
+                <li>💡 No hints</li>
+                <li>❤️ Wrong = instant death</li>
+              </ul>
+              <div class="diff-card-check" id="check-insane">✔</div>
+            </div>
+
+          </div>
+          <div class="panel-btns">
+            <button class="sk-btn sk-btn-outline" onclick="backToMainFromMode()">◀ Back</button>
+            <button class="sk-btn sk-btn-gold" id="btnNextMode" onclick="showHeroSelect()" disabled>▶ Next</button>
+          </div>
         </div>
-      </div>
-      <div class="panel-btns">
-        <button class="sk-btn sk-btn-outline" onclick="backToMainFromMode()">◀ Back</button>
-        <button class="sk-btn sk-btn-gold" id="btnNextMode" onclick="showHeroSelect()" disabled>▶ Next</button>
+
       </div>
     </div>
 
@@ -74,50 +131,67 @@
     <div class="sk-panel hidden" id="heroPanel">
       <h2 class="panel-title">— CHOOSE YOUR HERO —</h2>
       <div class="hero-cards">
-        <!-- Knight -->
-        <div class="hero-card" id="card-knight" onclick="selectHero('knight')">
-          <img src="/static/image/Characters/Knight.png" alt="Knight" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">KNIGHT</div>
-          <div class="hero-card-desc">High HP · Bonus time</div>
+        <!-- New Characters moved here -->
+        <div class="hero-card" id="card-assassin" onclick="selectHero('assassin')">
+          <img src="/static/image/Characters/New Characters/Assassin_0.gif" alt="Assassin" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">ASSASSIN</div>
+          <div class="hero-card-desc">Glass Cannon · High Crit</div>
           <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar">
-              <div class="stat-fill hp-fill" style="width:90%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:50%"></div></div>
           </div>
           <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar">
-              <div class="stat-fill atk-fill" style="width:65%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:95%"></div></div>
           </div>
           <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar">
-              <div class="stat-fill spd-fill" style="width:50%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:100%"></div></div>
           </div>
         </div>
-        <!-- NightBorne removed -->
-        <!-- Fish Mage removed -->
-        <!-- Pistol Rogue -->
-        <div class="hero-card" id="card-rogue" onclick="selectHero('rogue')">
-          <img src="/static/image/Characters/Knight.png" alt="Rogue" class="hero-card-img pixel-img rogue-tint" />
-          <div class="hero-card-name">ROGUE</div>
-          <div class="hero-card-desc">Criticals · Lethal speed</div>
+
+        <div class="hero-card" id="card-engineer" onclick="selectHero('engineer')">
+          <img src="/static/image/Characters/New Characters/Engineer_0.gif" alt="Engineer" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">ENGINEER</div>
+          <div class="hero-card-desc">Turrets · Utility</div>
           <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar">
-              <div class="stat-fill hp-fill" style="width:65%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:70%"></div></div>
           </div>
           <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar">
-              <div class="stat-fill atk-fill" style="width:75%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:60%"></div></div>
           </div>
           <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar">
-              <div class="stat-fill spd-fill" style="width:95%"></div>
-            </div>
+            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:60%"></div></div>
           </div>
         </div>
+
+        <div class="hero-card" id="card-warliege" onclick="selectHero('warliege')">
+          <img src="/static/image/Characters/New Characters/Warliege_0.webp" alt="Warliege" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">WARLIEGE</div>
+          <div class="hero-card-desc">Tank · High HP</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:95%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:75%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:50%"></div></div>
+          </div>
+        </div>
+
+        <div class="hero-card" id="card-witch" onclick="selectHero('witch')">
+          <img src="/static/image/Characters/New Characters/Witch_0.gif" alt="Witch" class="hero-card-img pixel-img" />
+          <div class="hero-card-name">WITCH</div>
+          <div class="hero-card-desc">Magic · Area Effects</div>
+          <div class="stat-row"><span class="stat-lbl">HP</span>
+            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:60%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">ATK</span>
+            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:85%"></div></div>
+          </div>
+          <div class="stat-row"><span class="stat-lbl">SPD</span>
+            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:75%"></div></div>
+          </div>
+        </div>
+
         <!-- Elite Knight -->
         <div class="hero-card" id="card-knight2" onclick="selectHero('knight2')">
           <img src="/static/image/Characters/Knight_1.webp" alt="Elite Knight" class="hero-card-img pixel-img" />
@@ -141,7 +215,7 @@
         </div>
         <!-- Fire Knight -->
         <div class="hero-card" id="card-fireknight" onclick="selectHero('fireknight')">
-          <img src="/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/01_idle/idle_1.png" alt="Fire Knight" class="hero-card-img pixel-img" style="transform: scale(2);" />
+          <img src="/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/01_idle/idle_1.png" alt="Fire Knight" class="hero-card-img pixel-img fireknight-card-img" />
           <div class="hero-card-name">FIRE KNIGHT</div>
           <div class="hero-card-desc">Blazing Speed · High ATK</div>
           <div class="stat-row"><span class="stat-lbl">HP</span>
@@ -218,7 +292,7 @@
     }
     function selectMode(mode) {
       selectedMode = mode;
-      document.querySelectorAll('.mode-option').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
       document.getElementById('mode-' + mode).classList.add('selected');
       document.getElementById('btnNextMode').disabled = false;
     }

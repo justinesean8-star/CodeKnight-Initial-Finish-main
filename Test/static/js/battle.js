@@ -8,10 +8,12 @@ const combatL = document.getElementById('combatLayer');
 
 // ── Hero Classes ──
 const HEROES = {
-  knight: { name:'KNIGHT', img:'knight', maxHp:120, atk:20, timerBonus:10, hints:0, critChance:0.1, speed: 200 },
-  rogue:  { name:'ROGUE', img:'knight', maxHp:85, atk:25, timerBonus:0, hints:0, critChance:0.35, tint:'#bf5fff', speed: 260 },
   knight2:{ name:'ELITE KNIGHT', img:'knight2', maxHp:150, atk:25, timerBonus:5, hints:1, critChance:0.2, speed: 210 },
   fireknight: { name:'FIRE KNIGHT', img:'fireknight', maxHp:100, atk:35, timerBonus:0, hints:0, critChance:0.25, speed: 230 },
+  assassin: { name:'ASSASSIN', img:'assassin', maxHp:80, atk:40, timerBonus:0, hints:0, critChance:0.45, speed: 300 },
+  engineer: { name:'ENGINEER', img:'engineer', maxHp:110, atk:22, timerBonus:5, hints:1, critChance:0.1, speed: 180 },
+  warliege: { name:'WARLIEGE', img:'warliege', maxHp:170, atk:30, timerBonus:8, hints:0, critChance:0.15, speed: 190 },
+  witch: { name:'WITCH', img:'witch', maxHp:95, atk:30, timerBonus:0, hints:1, critChance:0.2, speed: 220 },
 };
 
 const ENEMY_STATS = {
@@ -26,6 +28,13 @@ const ENEMY_STATS = {
 const IMG_SRC = {
   knight: '/static/image/Characters/Knight.png',
   knight2: '/static/image/Characters/Knight_1.webp',
+  assassin: '/static/image/Characters/New Characters/Assassin_0.gif',
+  assassin_weapon: '/static/image/Characters/New Characters/Assassin_weapon.png',
+  engineer: '/static/image/Characters/New Characters/Engineer_0.gif',
+  engineer_weapon: '/static/image/Characters/New Characters/Engineer_weapon.png',
+  warliege: '/static/image/Characters/New Characters/Warliege_0.webp',
+  witch: '/static/image/Characters/New Characters/Witch_0.gif',
+  witch_weapon: '/static/image/Characters/New Characters/Witch_weapon.png',
   pistol: '/static/image/OldPistol.png',
   bullet: '/static/image/OldPistolBullet.png',
   Mummy:  '/static/image/Enemy/Mummy.png',
@@ -206,7 +215,7 @@ async function loadTmxMap() {
 }
 
 // ── Game State ──
-const heroKey  = localStorage.getItem('hero') || 'knight';
+const heroKey  = localStorage.getItem('hero') || 'knight2';
 const heroData = HEROES[heroKey] || HEROES.knight;
 
 const difficulty = localStorage.getItem('difficulty') || 'easy';
@@ -412,10 +421,12 @@ function drawSprite(img, x, y, scale, flipX, shakeAmt, flashAmt, tint) {
 }
 
 function drawWeapon(x, y, flipX) {
-  const img = IMGS.pistol;
+  const weaponKey = heroData.img + '_weapon';
+  const img = IMGS[weaponKey] || IMGS.pistol;
   const heroI = IMGS[heroData.img];
   if (!img || !heroI) return;
-  const scale = heroData.img === 'knight2' ? 0.15 : 0.48;
+  const isLargeSprite = (heroData.img === 'knight2' || heroData.img === 'assassin' || heroData.img === 'engineer' || heroData.img === 'warliege' || heroData.img === 'witch');
+  const scale = isLargeSprite ? 0.22 : 0.48;
   const iH = heroI.height * scale, iW = heroI.width * scale;
   const handX = offsetX + x + (flipX ? -1 : 1) * iW * 0.22;
   const handY = offsetY + y - iH * 0.35;
@@ -423,7 +434,19 @@ function drawWeapon(x, y, flipX) {
   ctx.imageSmoothingEnabled = false;
   ctx.translate(handX, handY);
   if (flipX) ctx.scale(-1, 1);
-  ctx.scale(0.48, 0.48); // keep pistol constant size
+  
+  // Choose scale based on the weapon image dimensions
+  let wScale = 0.48;
+  if (heroData.img === 'assassin') {
+    wScale = 0.15;
+  } else if (heroData.img === 'engineer') {
+    wScale = 0.22;
+  } else if (heroData.img === 'witch') {
+    wScale = 0.20;
+  } else if (isLargeSprite) {
+    wScale = 0.22;
+  }
+  ctx.scale(wScale, wScale);
   ctx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
   ctx.restore();
 }
@@ -1071,8 +1094,9 @@ function loop(timestamp) {
     }
   }
 
-  if (heroImg) {
-    let heroScale = (baseKey === 'knight2') ? 0.15 : 0.48;
+  const isLargeSprite = (baseKey === 'knight2' || baseKey === 'assassin' || baseKey === 'engineer' || baseKey === 'warliege' || baseKey === 'witch');
+  if (heroImg && !isLargeSprite) {
+    let heroScale = 0.48;
     if (baseKey === 'fireknight') heroScale = 1.1;
     
     // The fire knight might need an offset depending on sprite padding
@@ -1087,13 +1111,21 @@ function loop(timestamp) {
     const heroDom = document.getElementById('heroDomSprite');
     // Prefer an animation-specific asset if available (e.g. nightborne_run)
     const src = IMG_SRC[animKey] || IMG_SRC[baseKey] || null;
-    if (src && !heroDom.src.includes(src)) {
-      heroDom.src = src;
+    if (src) {
+      if (heroDom.dataset.currentSrc !== src) {
+        heroDom.dataset.currentSrc = src;
+        heroDom.src = src;
+      }
       heroDom.classList.remove('hidden');
+    } else {
+      heroDom.dataset.currentSrc = '';
+      heroDom.src = '';
+      heroDom.classList.add('hidden');
     }
     
     const hImg = IMGS[animKey] || IMGS[baseKey] || null;
-    const hScale = heroData.img === 'knight2' ? 0.15 : 0.48;
+    const isLargeDom = (heroData.img === 'knight2' || heroData.img === 'assassin' || heroData.img === 'engineer' || heroData.img === 'warliege' || heroData.img === 'witch');
+    const hScale = isLargeDom ? 0.22 : 0.48;
     const w = hImg ? hImg.width * hScale : 64;
     const h = hImg ? hImg.height * hScale : 64;
     heroDom.style.width = w + 'px';
