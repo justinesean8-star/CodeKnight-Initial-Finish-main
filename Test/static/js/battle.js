@@ -37,6 +37,84 @@ const IMGS = {};
 const ENEMY_ANIMS = {}; // will hold arrays of frames for complex enemies like BossDemon
 const HERO_ANIMS = {};
 
+// ── Audio / Music ──
+const AUDIO_SRC = {
+  // music
+  music_bg: '/static/Sounds/Musical Effects/8_bit_inn.wav',
+  music_menu: '/static/Sounds/Musical Effects/8_bit_level_start.wav',
+
+  // generic UI / feedback
+  sfx_correct: '/static/Sounds/Musical Effects/8_bit_chime_positive.wav',
+  sfx_wrong: '/static/Sounds/Musical Effects/8_bit_negative_quick.wav',
+  sfx_level_complete: '/static/Sounds/Musical Effects/8_bit_level_complete.wav',
+  sfx_defeated: '/static/Sounds/Musical Effects/8_bit_defeated.wav',
+  ui_click: '/static/Sounds/UI/select_1.wav',
+
+  // weapons / impacts
+  sfx_shot: '/static/Sounds/Weapons/shot_muffled.wav',
+  sfx_weapon_slice: '/static/Sounds/Weapons/sword_slice.wav',
+
+  // combat & gore (hero hit / enemy hit / death)
+  combat_splat: '/static/Sounds/Combat and Gore/splat_quick.wav',
+  combat_swipe: '/static/Sounds/Combat and Gore/swipe.wav',
+  combat_crunch: '/static/Sounds/Combat and Gore/crunch.wav',
+
+  // footsteps (wood variants)
+  foot_wood_1: '/static/Sounds/Footsteps/digital/digital_footstep_wood_1.wav',
+  foot_wood_2: '/static/Sounds/Footsteps/digital/digital_footstep_wood_2.wav',
+  foot_wood_3: '/static/Sounds/Footsteps/digital/digital_footstep_wood_3.wav',
+  foot_wood_4: '/static/Sounds/Footsteps/digital/digital_footstep_wood_4.wav',
+  // gravel variants for enemies
+  foot_gravel_1: '/static/Sounds/Footsteps/digital/digital_footstep_gravel_1.wav',
+  foot_gravel_2: '/static/Sounds/Footsteps/digital/digital_footstep_gravel_2.wav',
+  foot_gravel_3: '/static/Sounds/Footsteps/digital/digital_footstep_gravel_3.wav',
+  foot_gravel_4: '/static/Sounds/Footsteps/digital/digital_footstep_gravel_4.wav',
+
+  // character-specific
+  fx_fireknight: '/static/Sounds/Weapons/sword_light.wav',
+  fx_bossdemon: '/static/Sounds/Combat and Gore/crunch_splat.wav'
+};
+
+// bullet-specific
+AUDIO_SRC.bullet_whiz = '/static/Sounds/UI/sci_fi_hover.wav';
+AUDIO_SRC.bullet_impact = '/static/Sounds/Weapons/harsh_thud.wav';
+const AUDIOS = {};
+
+function loadAudio(key, path) {
+  return new Promise(res => {
+    try {
+      const a = new Audio();
+      a.src = encodeURI(path);
+      // allow fast reuse for short SFX by preloading
+      a.preload = 'auto';
+      a.oncanplaythrough = () => { AUDIOS[key] = a; res(); };
+      a.onerror = () => { AUDIOS[key] = a; res(); };
+    } catch (e) {
+      AUDIOS[key] = null; res();
+    }
+  });
+}
+
+function playSound(key, opts = {}) {
+  const a = AUDIOS[key];
+  if (!a) return;
+  // For overlapping SFX, clone the node so sounds can layer
+  if (opts.clone) {
+    try {
+      const c = a.cloneNode();
+      c.volume = opts.volume ?? 1.0;
+      c.play().catch(()=>{});
+    } catch (e) {}
+  } else {
+    try {
+      a.volume = opts.volume ?? a.volume ?? 1.0;
+      a.currentTime = opts.restart ? 0 : a.currentTime;
+      a.loop = !!opts.loop;
+      a.play().catch(()=>{});
+    } catch (e) {}
+  }
+}
+
 function loadFireKnightFrames() {
   const base = '/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/';
   const mapping = {
@@ -163,6 +241,7 @@ let A = {
   torchFlicker: Math.random() * Math.PI * 2,
   lastTime: performance.now(),
   enemies: [],
+  footstepTimer: 0,
 };
 
 // ── Input State ──
@@ -359,6 +438,11 @@ function spawnBullet(fromX, fromY, toX, toY, isHero, isHoming = false) {
     vx: dx / len * spd, vy: dy / len * spd, 
     life: 2.5, isHero, isHoming 
   });
+  // play shot SFX when firing
+  if (isHero) playSound('sfx_shot', { clone: true, volume: 0.6 });
+  else playSound('sfx_shot', { clone: true, volume: 0.38 });
+  // bullet travel/whiz
+  playSound('bullet_whiz', { clone: true, volume: 0.28 });
 }
 
 function drawBullets(dt) {
@@ -430,7 +514,10 @@ function drawBullets(dt) {
     }
 
     if (hitEntity || hitWall || b.life <= 0) {
-      if (hitEntity || hitWall) spawnExplosion(offsetX + b.x, offsetY + b.y, !b.isHero);
+      if (hitEntity || hitWall) {
+        playSound('bullet_impact', { clone: true, volume: 0.9 });
+        spawnExplosion(offsetX + b.x, offsetY + b.y, !b.isHero);
+      }
       A.bullets.splice(i, 1);
     }
   }
@@ -448,6 +535,8 @@ function spawnExplosion(x, y, isRed) {
       color: cols[Math.floor(Math.random() * cols.length)]
     });
   }
+  // impact/hit sound
+  playSound('sfx_hit', { clone: true, volume: 0.7 });
 }
 
 function drawParticles(dt) {
@@ -566,6 +655,8 @@ async function submitCode() {
     document.getElementById('codeEditor').blur();
     
     if (data.correct) {
+      playSound('sfx_correct', { clone: true, volume: 0.9 });
+      if (heroKey === 'fireknight') playSound('fx_fireknight', { clone: true, volume: 0.95 });
         // play attack animation briefly
         A.heroAnim = 'attack';
         A.heroAnimFrame = 0;
@@ -585,6 +676,7 @@ async function submitCode() {
       updateHUD();
       setTimeout(loadQuestion, 2000);
     } else {
+      playSound('sfx_wrong', { clone: true, volume: 0.9 });
       showResult(false, data.error || 'Wrong answer!', data.actual, data.expected);
         // on wrong answer, still show a small attack recoil
         A.heroAnim = 'attack';
@@ -594,6 +686,7 @@ async function submitCode() {
       setTimeout(loadQuestion, 2000);
     }
   } catch(e) {
+    playSound('sfx_wrong', { clone: true, volume: 0.9 });
     A.heroAnim = 'attack';
     A.heroAnimFrame = 0;
     setTimeout(() => { if (G.heroHp > 0) A.heroAnim = 'idle'; }, 700);
@@ -613,6 +706,7 @@ function doHeroDamage(amt) {
   setTimeout(() => { if (G.heroHp > 0) A.heroAnim = 'idle'; }, 600);
   flashScreen('flash-red');
   spawnExplosion(offsetX + A.heroX, offsetY + A.heroY - 40, true);
+  playSound('combat_splat', { clone: true, volume: 0.9 });
   combatText('-' + amt, offsetX + A.heroX - 20, offsetY + A.heroY - 80, 'dmg-hero');
   updateHUD();
   if (G.heroHp <= 0) { setTimeout(gameOver, 700); }
@@ -629,6 +723,7 @@ function doEnemyDamage(en, amt) {
   }
   combatText('-' + amt, offsetX + en.x - 20 + Math.random()*40, offsetY + en.y - 80 + Math.random()*20, 'dmg-enemy');
   updateHUD();
+  playSound('combat_swipe', { clone: true, volume: 0.8 });
   
   if (en.hp <= 0 && !en.dying) {
     en.dying = true;
@@ -659,6 +754,9 @@ function enemyDied(en) {
     if (isDead) {
       clearInterval(dying);
       A.enemies = A.enemies.filter(e => e !== en);
+      // enemy death: play heavier crunch for bosses
+      if (en.type === 'BossDemon') playSound('fx_bossdemon', { clone: true, volume: 0.95 });
+      else playSound('combat_crunch', { clone: true, volume: 0.9 });
       if (A.enemies.length === 0) {
         stageClear();
       }
@@ -696,6 +794,8 @@ function spawnNextEnemy() {
       dying: false,
       spawning: true,
       fireCooldown: s.fireRate + Math.random()
+      ,
+      footTimer: 0.2 + Math.random() * 0.4
     });
   }
   
@@ -748,9 +848,11 @@ function hideResult() { document.getElementById('resultBox').classList.add('hidd
 function stageClear() {
   clearInterval(G.timerInterval);
   document.getElementById('stageClearOverlay').classList.remove('hidden');
+  playSound('sfx_level_complete', { clone: true, volume: 0.9 });
 }
 
 document.getElementById('btn-next-stage').addEventListener('click', () => {
+  playSound('ui_click', { clone: true, volume: 0.9 });
   document.getElementById('stageClearOverlay').classList.add('hidden');
   G.stage++;
   if (G.stage > 10) { document.getElementById('victoryOverlay').classList.remove('hidden'); return; }
@@ -764,8 +866,9 @@ function gameOver() {
   A.heroAnim = 'death';
   A.heroAnimFrame = 0;
   document.getElementById('gameOverOverlay').classList.remove('hidden');
+  playSound('sfx_defeated', { clone: true, volume: 0.95 });
 }
-document.getElementById('btn-restart').addEventListener('click', () => location.reload());
+document.getElementById('btn-restart').addEventListener('click', () => { playSound('ui_click', { clone: true, volume: 0.9 }); location.reload(); });
 
 // ── Main Render & Physics Loop ──
 function loop(timestamp) {
@@ -800,6 +903,14 @@ function loop(timestamp) {
     
     if (dx !== 0) A.heroDirX = dx > 0 ? 1 : -1;
     A.heroWalk += 15 * dt; 
+    // footsteps
+    A.footstepTimer -= dt;
+    if (A.footstepTimer <= 0) {
+      // pick a random wood footstep
+      const idx = 1 + Math.floor(Math.random() * 4);
+      playSound('foot_wood_' + idx, { clone: true, volume: 0.65 });
+      A.footstepTimer = 0.28; // seconds between steps
+    }
   } else {
     A.heroWalk = 0;
   }
@@ -889,13 +1000,25 @@ function loop(timestamp) {
             
             en.bob += 10 * dt;
             if (en.type === 'BossDemon') en.anim = 'walk';
+            // enemy footsteps when moving
+            en.footTimer -= dt;
+            if ((movedX || movedY) && en.footTimer <= 0) {
+              const idx = 1 + Math.floor(Math.random() * 4);
+              // boss heavier steps use gravel, others use wood/gravel mix
+              if (en.type === 'BossDemon') playSound('foot_gravel_' + idx, { clone: true, volume: 0.85 });
+              else playSound('foot_wood_' + idx, { clone: true, volume: 0.6 });
+              en.footTimer = 0.28 + Math.random() * 0.18;
+            }
           } else {
             if (stats.meleeRange) {
               en.fireCooldown -= dt;
               if (en.fireCooldown <= 0) {
-                 en.anim = 'attack';
+                  en.anim = 'attack';
                  en.animFrame = 0;
                  en.fireCooldown = stats.fireRate;
+                  // play attack SFX depending on enemy type
+                  if (en.type === 'BossDemon') playSound('fx_bossdemon', { clone: true, volume: 0.95 });
+                  else playSound('combat_swipe', { clone: true, volume: 0.7 });
               } else {
                  en.anim = 'idle';
               }
@@ -1040,6 +1163,10 @@ async function init() {
   await Promise.all(Object.entries(IMG_SRC).map(([k,s]) => loadImg(k, s)));
   await loadBossFrames();
   await loadFireKnightFrames();
+  // preload audio assets
+  await Promise.all(Object.entries(AUDIO_SRC).map(([k,p]) => loadAudio(k, p)));
+  // configure background music
+  if (AUDIOS.music_bg) { AUDIOS.music_bg.loop = true; AUDIOS.music_bg.volume = 0.22; playSound('music_bg', { loop: true, restart: true }); }
   spawnNextEnemy();
   requestAnimationFrame(loop);
   loadQuestion();

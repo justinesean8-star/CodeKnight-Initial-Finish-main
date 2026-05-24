@@ -235,6 +235,20 @@
       window.location.href = '/battle';
     }
   </script>
+    <script>
+      // Menu music: try autoplay, fallback to user interaction
+      const menuMusic = new Audio('/static/Sounds/Musical Effects/8_bit_inn.wav');
+      menuMusic.loop = true; menuMusic.volume = 0.22; menuMusic.preload = 'auto';
+      menuMusic.play().catch(()=>{
+        // resume on first interaction
+        const startMusic = () => { menuMusic.play().catch(()=>{}); window.removeEventListener('click', startMusic); };
+        window.addEventListener('click', startMusic);
+      });
+      // play a small UI click on menu buttons
+      document.querySelectorAll('#mainMenu button, .sk-panel button, .hero-card').forEach(b=>{
+        b.addEventListener('click', ()=>{ try { const c = new Audio('/static/Sounds/UI/select_1.wav'); c.volume=0.9; c.play().catch(()=>{}); } catch(e){} });
+      });
+    </script>
 </body>
 
 </html>
