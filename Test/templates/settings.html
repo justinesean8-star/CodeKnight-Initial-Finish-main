@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Settings — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .settings { padding:1rem; max-width:720px; margin:0 auto; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:0.6rem 0; }
+    .label { color:var(--dim); }
+    input[type=range] { width:240px; }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World</a></div>
+    <div class="version-tag">Settings</div>
+  </div>
+
+  <div class="settings">
+    <h2 style="font-family:var(--px);color:var(--gold)">Audio & Settings</h2>
+
+    <div class="row">
+      <div>
+        <div><strong>Music</strong></div>
+        <div class="label">Toggle background music</div>
+      </div>
+      <div>
+        <label><input type="checkbox" id="musicOn"> Music On</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div><strong>Music Volume</strong></div>
+        <div class="label">Adjust background music volume</div>
+      </div>
+      <div>
+        <input type="range" id="musicVol" min="0" max="1" step="0.01" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div><strong>SFX</strong></div>
+        <div class="label">Toggle sound effects</div>
+      </div>
+      <div>
+        <label><input type="checkbox" id="sfxOn"> SFX On</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div><strong>SFX Volume</strong></div>
+        <div class="label">Adjust sound effects volume</div>
+      </div>
+      <div>
+        <input type="range" id="sfxVol" min="0" max="1" step="0.01" />
+      </div>
+    </div>
+
+    <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+      <button class="sk-btn sk-btn-gold" id="btnSave">Save</button>
+      <button class="sk-btn sk-btn-outline" id="btnTestSfx">Test SFX</button>
+      <button class="sk-btn sk-btn-outline" id="btnTestMusic">Test Music</button>
+    </div>
+  </div>
+
+  <script>
+    const defaults = { musicOn:true, musicVolume:0.6, sfxOn:true, sfxVolume:0.9 };
+    async function loadSettings(){
+      let settings = JSON.parse(localStorage.getItem('ck_settings')||'null');
+      try{
+        const r = await fetch('/api/settings');
+        if (r.ok) { const j = await r.json(); settings = j.settings || settings || defaults; }
+      }catch(e){ settings = settings || defaults; }
+      localStorage.setItem('ck_settings', JSON.stringify(settings));
+      document.getElementById('musicOn').checked = !!settings.musicOn;
+      document.getElementById('musicVol').value = settings.musicVolume ?? 0.6;
+      document.getElementById('sfxOn').checked = !!settings.sfxOn;
+      document.getElementById('sfxVol').value = settings.sfxVolume ?? 0.9;
+    }
+
+    async function saveSettings(){
+      const s = { musicOn: !!document.getElementById('musicOn').checked, musicVolume: parseFloat(document.getElementById('musicVol').value), sfxOn: !!document.getElementById('sfxOn').checked, sfxVolume: parseFloat(document.getElementById('sfxVol').value) };
+      localStorage.setItem('ck_settings', JSON.stringify(s));
+      try{
+        const r = await fetch('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({settings:s})});
+        if (!r.ok) { alert('Saved locally (not signed in)'); return; }
+        alert('Saved');
+      }catch(e){ alert('Saved locally'); }
+    }
+
+    document.getElementById('btnSave').addEventListener('click', saveSettings);
+    document.getElementById('btnTestSfx').addEventListener('click', ()=>{ try{ const a = new Audio('/static/Sounds/Musical Effects/8_bit_chime_positive.wav'); a.volume = parseFloat(document.getElementById('sfxVol').value); a.play().catch(()=>{}); }catch(e){} });
+    document.getElementById('btnTestMusic').addEventListener('click', ()=>{ try{ const a = new Audio('/static/Sounds/Musical Effects/8_bit_inn.wav'); a.volume = parseFloat(document.getElementById('musicVol').value); a.play().catch(()=>{}); }catch(e){} });
+    loadSettings();
+  </script>
+</body>
+</html>

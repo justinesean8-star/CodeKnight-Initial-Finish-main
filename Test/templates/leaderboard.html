@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Leaderboard — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .board-wrap { padding:1rem; max-width:760px; margin:0 auto; }
+    .leader { display:flex; justify-content:space-between; padding:0.6rem; border-radius:6px; background:var(--bg2); margin-top:0.5rem; }
+    .rank { font-weight:700; color:var(--gold); }
+    .meta { color:var(--dim); }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World</a></div>
+    <div class="version-tag">Leaderboard</div>
+  </div>
+
+  <div class="board-wrap">
+    <h2 style="font-family:var(--px);color:var(--gold)">Top Players</h2>
+    <div style="display:flex;gap:0.6rem;margin-bottom:0.6rem;"><button class="sk-btn sk-btn-gold" id="btnRefresh">Refresh</button></div>
+    <div id="leaders">Loading...</div>
+  </div>
+
+  <script>
+    async function loadLeaders(){
+      const el = document.getElementById('leaders'); el.innerHTML='';
+      try{
+        const r = await fetch('/api/leaderboard');
+        const j = await r.json();
+        const list = j.leaders || [];
+        if (!list.length) { el.innerHTML = '<div class="meta">No players yet</div>'; return; }
+        list.forEach((p,idx)=>{
+          const d = document.createElement('div'); d.className='leader';
+          d.innerHTML = '<div><span class="rank">#'+ (idx+1) +'</span> <strong>'+p.username+'</strong><div class="meta">Level '+p.level+'</div></div><div><div class="meta">XP: '+p.xp+'</div></div>';
+          el.appendChild(d);
+        });
+      }catch(e){ el.innerHTML = '<div class="meta">Could not load leaderboard</div>'; }
+    }
+
+    document.getElementById('btnRefresh').addEventListener('click', loadLeaders);
+    loadLeaders();
+  </script>
+</body>
+</html>

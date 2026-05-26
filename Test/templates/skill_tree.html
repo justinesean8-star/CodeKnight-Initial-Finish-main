@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Skill Tree — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .tree-wrap { padding:1rem; }
+    .tree { display:flex; gap:2rem; align-items:flex-start; justify-content:center; margin-top:1rem; }
+    .skill-node { width:140px; height:80px; background:linear-gradient(180deg,#0f1724,#111827); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--text); font-family:var(--px); cursor:pointer; border:2px solid rgba(255,255,255,0.04); }
+    .skill-node.unlocked { background:linear-gradient(90deg,var(--purple),#a78bfa); color:#1a0d00; border-color:rgba(167,139,250,0.6); box-shadow:0 8px 30px rgba(167,139,250,0.08); }
+    .skill-row { display:flex; gap:1.6rem; }
+    .guide { color:var(--dim); }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World Map</a></div>
+    <div class="version-tag">Skill Tree</div>
+  </div>
+
+  <div class="tree-wrap">
+    <div style="display:flex;justify-content:center;gap:2rem;">
+      <div style="max-width:960px;text-align:center">
+        <h2 style="font-family:var(--px);color:var(--gold);letter-spacing:3px">Skill Tree</h2>
+        <div class="guide">Unlock nodes by spending skill points earned from challenges. Unlocked skills grant in-game perks and knowledge.</div>
+      </div>
+    </div>
+
+    <div class="tree">
+      <div class="skill-column">
+        <div class="skill-row"><div class="skill-node" data-id="vars">Variables</div></div>
+        <div style="height:18px"></div>
+        <div class="skill-row"><div class="skill-node" data-id="loops">Loops</div><div class="skill-node" data-id="functions">Functions</div></div>
+      </div>
+
+      <div class="skill-column">
+        <div class="skill-row"><div class="skill-node" data-id="datastruct">Data Structures</div></div>
+        <div style="height:18px"></div>
+        <div class="skill-row"><div class="skill-node" data-id="oop">OOP</div><div class="skill-node" data-id="io">File I/O</div></div>
+        <div style="height:18px"></div>
+        <div class="skill-row"><div class="skill-node" data-id="debug">Debugging</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;display:flex;justify-content:center;gap:0.6rem;">
+      <button class="sk-btn sk-btn-gold" id="btnSync">Sync Node State</button>
+      <button class="sk-btn sk-btn-outline" id="btnResetLocal">Reset Local</button>
+    </div>
+  </div>
+
+  <script>
+    let nodes = {};
+    let unlocked = new Set();
+
+    async function fetchTree(){
+      try{
+        const r = await fetch('/api/skilltree');
+        const j = await r.json();
+        nodes = {};
+        j.nodes.forEach(n=> nodes[n.id]=n);
+        unlocked = new Set(j.unlocked || []);
+        render();
+      }catch(e){
+        // fallback to local
+        const local = JSON.parse(localStorage.getItem('ck_skill_unlocked')||'[]'); unlocked = new Set(local); render();
+      }
+    }
+
+    function render(){
+      document.querySelectorAll('.skill-node').forEach(el=>{
+        const id = el.dataset.id;
+        if (unlocked.has(id)) el.classList.add('unlocked'); else el.classList.remove('unlocked');
+      });
+    }
+
+    document.querySelectorAll('.skill-node').forEach(el=>{
+      el.addEventListener('click', async ()=>{
+        const id = el.dataset.id;
+        if (unlocked.has(id)) { alert('Already unlocked'); return; }
+        // try server unlock
+        try{
+          const res = await fetch('/api/skilltree/unlock', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({node:id}) });
+          const j = await res.json();
+          if (!res.ok) { if (j.missing) alert('Missing prerequisite: '+j.missing); else alert(j.error || 'Unlock failed'); return; }
+          unlocked = new Set(j.unlocked || []);
+          render();
+          alert('Unlocked '+id);
+        }catch(e){
+          // local fallback
+          const cur = JSON.parse(localStorage.getItem('ck_skill_unlocked')||'[]'); cur.push(id); localStorage.setItem('ck_skill_unlocked', JSON.stringify(cur)); unlocked = new Set(cur); render(); alert('Unlocked locally');
+        }
+      });
+    });
+
+    document.getElementById('btnSync').addEventListener('click', ()=>{ fetchTree(); });
+    document.getElementById('btnResetLocal').addEventListener('click', ()=>{ localStorage.removeItem('ck_skill_unlocked'); fetchTree(); alert('Local reset'); });
+
+    fetchTree();
+  </script>
+</body>
+</html>

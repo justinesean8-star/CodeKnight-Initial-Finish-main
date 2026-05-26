@@ -1,0 +1,27 @@
+{
+  "users": {
+    "Justine": {
+      "password": "scrypt:32768:8:1$oaZprCV0Bpblan2s$7bd0b0e743aa459b89b102f892f730bf0c0fe612659fd560db758a9b84292ffb1ee83e0168d2bb1fc92f2bd198c8d6f781ae43e55529820e0ff800f80fb488e1",
+      "xp": 10,
+      "level": 1,
+      "achievements": [],
+      "save": {
+        "hero": "engineer",
+        "difficulty": "normal",
+        "stage": 1,
+        "heroHp": 110,
+        "heroExp": 0,
+        "heroLevel": 1
+      },
+      "skill_unlocked": [
+        "vars",
+        "loops"
+      ],
+      "quests": {
+        "daily_1": {
+          "completed": true
+        }
+      }
+    }
+  }
+}

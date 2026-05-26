@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>World Map — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .map-wrap { height: calc(100vh - 56px); display:flex; align-items:center; justify-content:center; }
+    .map { width: 92vw; height: 78vh; background: linear-gradient(180deg,#0b1220,#07101a); border-radius:12px; position:relative; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    .island { position:absolute; width:140px; height:100px; border-radius:10px; background:linear-gradient(180deg,#ffd27a,#ff9f4a); color:#1a0d00; display:flex; align-items:center; justify-content:center; font-family:var(--px); cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,0.6); }
+    .island.small { width:110px; height:78px; }
+    .island .label { font-size:0.7rem; }
+    .map-hud { position:absolute; top:12px; left:12px; z-index:20; }
+    .module-panel { position:absolute; right:12px; top:12px; width:300px; background:var(--bg2); border-radius:8px; padding:0.9rem; border:1px solid rgba(255,255,255,0.03); display:none; z-index:30; }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/skill-tree">🌳 Skill Tree</a></div>
+    <div class="version-tag">World Map</div>
+  </div>
+  <div class="map-wrap">
+    <div class="map" id="map">
+      <div class="island" id="is-vars" style="left:8%; top:12%" data-id="vars"><div class="label">Variables</div></div>
+      <div class="island small" id="is-loops" style="left:26%; top:36%" data-id="loops"><div class="label">Loops</div></div>
+      <div class="island" id="is-func" style="left:50%; top:20%" data-id="functions"><div class="label">Functions</div></div>
+      <div class="island" id="is-data" style="left:70%; top:40%" data-id="datastruct"><div class="label">Data Structures</div></div>
+      <div class="island small" id="is-oop" style="left:16%; top:68%" data-id="oop"><div class="label">OOP</div></div>
+      <div class="island" id="is-io" style="left:46%; top:68%" data-id="io"><div class="label">File I/O</div></div>
+      <div class="island small" id="is-debug" style="left:76%; top:72%" data-id="debug"><div class="label">Debugging</div></div>
+
+      <div class="module-panel" id="modulePanel">
+        <h3 id="modTitle">Module</h3>
+        <p id="modDesc" style="color:var(--dim)"></p>
+        <div style="margin-top:0.6rem; display:flex; gap:0.6rem;">
+          <button class="sk-btn sk-btn-gold" id="btnStart">▶ Start Module</button>
+          <button class="sk-btn sk-btn-outline" id="btnClose">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const NODES = {
+      vars:{label:'Variables',desc:'Learn naming, assignment and types.'},
+      loops:{label:'Loops',desc:'For and while loops, iteration patterns.'},
+      functions:{label:'Functions',desc:'Define and call reusable functions.'},
+      datastruct:{label:'Data Structures',desc:'Lists, dicts, sets and tuples.'},
+      oop:{label:'OOP',desc:'Classes, objects, and methods.'},
+      io:{label:'File I/O',desc:'Reading and writing files.'},
+      debug:{label:'Debugging',desc:'Use print, assertions and debuggers.'}
+    };
+
+    document.querySelectorAll('.island').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const id = el.dataset.id; const info = NODES[id] || {label:id,desc:''};
+        document.getElementById('modTitle').textContent = info.label;
+        document.getElementById('modDesc').textContent = info.desc;
+        const panel = document.getElementById('modulePanel'); panel.style.display='block';
+        window.selectedModule = id;
+      });
+    });
+    document.getElementById('btnClose').addEventListener('click', ()=>{ document.getElementById('modulePanel').style.display='none'; });
+    document.getElementById('btnStart').addEventListener('click', ()=>{
+      if (!window.selectedModule) return;
+      localStorage.setItem('selectedModule', window.selectedModule);
+      // start battle (Battle page reads difficulty from localStorage)
+      window.location.href = '/battle';
+    });
+  </script>
+</body>
+</html>

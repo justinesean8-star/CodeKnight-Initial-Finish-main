@@ -14,22 +14,84 @@
 <body class="menu-page">
   <div class="stars" id="stars"></div>
 
-  <div class="menu-wrap">
-    <!-- TITLE SECTION -->
-    <div class="title-block">
-      <div class="swords-icon">⚔️</div>
-      <h1 class="pixel-title">CODE<br />KNIGHT</h1>
-      <p class="pixel-sub">" solve python · slay dungeons "</p>
-    </div>
+  <div class="menu-wrap codecombat-hero">
+    <div class="menu-hero" id="mainMenu">
+      <div class="hero-left">
+        <div class="hero-heading">
+          <div class="swords-icon">⚔️</div>
+          <h1 class="pixel-title">CODE<br/>KNIGHT</h1>
+          <p class="pixel-sub">solve python · slay dungeons</p>
+        </div>
+        <div class="hero-art-wrap">
+          <img src="/static/image/Characters/Knight_1.webp" alt="Elite Knight" class="hero-art pixel-img" />
+          <div class="hero-art-decor" aria-hidden="true"></div>
+        </div>
+      </div>
 
-    <!-- MAIN MENU BUTTONS -->
-    <div class="main-menu-btns" id="mainMenu">
-      <button class="sk-btn sk-btn-gold" id="btnNewGame" onclick="showModeSelect()">
-        ▶ New Game
-      </button>
-      <button class="sk-btn sk-btn-outline" id="btnHowTo" onclick="showHowTo()">
-        ▶ How to Play
-      </button>
+      <div class="hero-right">
+        <div class="floating-actions" role="navigation" aria-label="Main actions">
+          <a class="float-btn float-large" href="/battle" data-tooltip="Play" title="Play">
+            <div class="float-ico">
+              <img src="/static/image/Characters/Knight.png" alt="Play" class="pix-icon"/>
+            </div>
+            <div class="float-label">Play</div>
+          </a>
+          <a class="float-btn" href="/world" data-tooltip="World Map" title="World Map">
+            <div class="float-ico">
+              <img src="/static/image/floors.png" alt="World" class="pix-icon"/>
+            </div>
+            <div class="float-label">World</div>
+          </a>
+          <a class="float-btn" href="/skill-tree" data-tooltip="Skill Tree" title="Skill Tree">
+            <div class="float-ico">
+              <img src="/static/image/Characters/New%20Characters/Witch_weapon.png" alt="Skills" class="pix-icon"/>
+            </div>
+            <div class="float-label">Skills</div>
+          </a>
+          <a class="float-btn" href="/inventory" data-tooltip="Inventory" title="Inventory">
+            <div class="float-ico">
+              <img src="/static/image/%E6%9C%A8%E7%AE%B1.png" alt="Inventory" class="pix-icon"/>
+            </div>
+            <div class="float-label">Inventory</div>
+          </a>
+          <a class="float-btn" href="/quests" data-tooltip="Daily Quests" title="Daily Quests">
+            <div class="float-ico">
+              <img src="/static/image/1.png" alt="Quests" class="pix-icon"/>
+            </div>
+            <div class="float-label">Quests</div>
+          </a>
+          <a class="float-btn" href="/journal" data-tooltip="Journal" title="Journal">
+            <div class="float-ico">
+              <img src="/static/image/Characters/New%20Characters/Assassin_weapon.png" alt="Journal" class="pix-icon"/>
+            </div>
+            <div class="float-label">Journal</div>
+          </a>
+          <a class="float-btn" href="/leaderboard" data-tooltip="Leaderboard" title="Leaderboard">
+            <div class="float-ico">
+              <img src="/static/image/Enemy/Mummy.png" alt="Leaderboard" class="pix-icon"/>
+            </div>
+            <div class="float-label">Leaderboard</div>
+          </a>
+          <a class="float-btn" href="/settings" data-tooltip="Settings" title="Settings">
+            <div class="float-ico">
+              <img src="/static/image/OldPistol.png" alt="Settings" class="pix-icon"/>
+            </div>
+            <div class="float-label">Settings</div>
+          </a>
+          {% if session.get('user') %}
+            <a class="float-btn" href="/dashboard" title="Dashboard"><div class="float-ico">👤</div><div class="float-label">Dashboard</div></a>
+            <a class="float-btn" href="/api/logout" title="Logout"><div class="float-ico">🔒</div><div class="float-label">Logout</div></a>
+          {% else %}
+            <a class="float-btn" href="/login" title="Login"><div class="float-ico">🔑</div><div class="float-label">Login</div></a>
+            <a class="float-btn" href="/register" title="Register"><div class="float-ico">✍️</div><div class="float-label">Register</div></a>
+          {% endif %}
+        </div>
+
+        <div class="secondary-actions">
+          <button class="sk-btn sk-btn-outline" onclick="showHowTo()">How to Play</button>
+          <button class="sk-btn sk-btn-gold" onclick="showModeSelect()">New Game</button>
+        </div>
+      </div>
     </div>
 
     <!-- HOW TO PLAY PANEL -->
@@ -322,6 +384,12 @@
       document.querySelectorAll('#mainMenu button, .sk-panel button, .hero-card').forEach(b=>{
         b.addEventListener('click', ()=>{ try { const c = new Audio('/static/Sounds/UI/select_1.wav'); c.volume=0.9; c.play().catch(()=>{}); } catch(e){} });
       });
+
+      // Trigger entrance animation for floating actions
+      try {
+        const fa = document.querySelector('.floating-actions');
+        if (fa) setTimeout(() => fa.classList.add('entrance'), 160);
+      } catch (e) { /* ignore */ }
     </script>
 </body>
 

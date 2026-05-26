@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inventory — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .inv-wrap { padding:1rem; }
+    .inv-list { display:flex; flex-direction:column; gap:0.6rem; margin-top:1rem; max-width:760px; }
+    .inv-item { background:var(--bg2); padding:0.6rem; border-radius:8px; display:flex; justify-content:space-between; align-items:center; }
+    .inv-meta { color:var(--dim); font-size:0.9rem }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World</a></div>
+    <div class="version-tag">Inventory</div>
+  </div>
+
+  <div class="inv-wrap">
+    <div style="display:flex; gap:0.6rem;">
+      <button class="sk-btn sk-btn-gold" id="btnSync">Sync Inventory</button>
+      <button class="sk-btn sk-btn-outline" id="btnAdd">Add Sample Loot</button>
+      <button class="sk-btn sk-btn-outline" id="btnClear">Clear Local</button>
+    </div>
+
+    <div class="inv-list" id="invList">Loading...</div>
+  </div>
+
+  <script>
+    async function loadInventory(){
+      const listEl = document.getElementById('invList');
+      try{
+        const r = await fetch('/api/inventory');
+        if (r.status === 401) throw new Error('guest');
+        const j = await r.json();
+        const inv = j.inventory || [];
+        localStorage.setItem('ck_inventory', JSON.stringify(inv));
+        render(inv);
+      }catch(e){
+        const inv = JSON.parse(localStorage.getItem('ck_inventory')||'[]');
+        render(inv);
+      }
+    }
+
+    function render(inv){
+      const listEl = document.getElementById('invList');
+      if (!inv.length) { listEl.innerHTML = '<div class="inv-meta">No items yet</div>'; return; }
+      listEl.innerHTML = '';
+      inv.forEach(it=>{
+        const div = document.createElement('div'); div.className='inv-item';
+        const left = document.createElement('div'); left.innerHTML = '<strong>'+ (it.name||it.id) +'</strong><div class="inv-meta">qty: '+(it.qty||1)+'</div>';
+        const right = document.createElement('div');
+        const rem = document.createElement('button'); rem.className='sk-btn sk-btn-outline'; rem.textContent='Drop';
+        rem.onclick = ()=> removeItem(it.id);
+        right.appendChild(rem);
+        div.appendChild(left); div.appendChild(right);
+        listEl.appendChild(div);
+      });
+    }
+
+    async function addSample(){
+      const sample = {id:'rusty_sword', name:'Rusty Sword', qty:1};
+      try{
+        const r = await fetch('/api/inventory/add', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({item:sample})});
+        if (!r.ok) throw new Error('server');
+        const j = await r.json(); render(j.inventory||[]);
+      }catch(e){
+        const cur = JSON.parse(localStorage.getItem('ck_inventory')||'[]'); cur.push(sample); localStorage.setItem('ck_inventory', JSON.stringify(cur)); render(cur);
+      }
+    }
+
+    async function removeItem(id){
+      try{
+        const r = await fetch('/api/inventory/remove', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
+        if (!r.ok) throw new Error('server');
+        const j = await r.json(); render(j.inventory||[]);
+      }catch(e){
+        const cur = JSON.parse(localStorage.getItem('ck_inventory')||'[]'); const next = cur.filter(it=>it.id!==id); localStorage.setItem('ck_inventory', JSON.stringify(next)); render(next);
+      }
+    }
+
+    document.getElementById('btnSync').addEventListener('click', loadInventory);
+    document.getElementById('btnAdd').addEventListener('click', addSample);
+    document.getElementById('btnClear').addEventListener('click', ()=>{ localStorage.removeItem('ck_inventory'); loadInventory(); });
+
+    loadInventory();
+  </script>
+</body>
+</html>

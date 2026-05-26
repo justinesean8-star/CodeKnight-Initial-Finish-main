@@ -13,6 +13,8 @@
   <header class="hud">
     <div class="hud-left">
       <a href="/" class="back-btn" id="btn-back-home">🏠</a>
+      <button class="sk-btn sk-btn-outline" id="btn-save-state" title="Save">💾</button>
+      <button class="sk-btn sk-btn-outline" id="btn-load-state" title="Load">🔁</button>
       <div class="hud-hero-info">
         <span class="hud-label" id="heroName">KNIGHT</span>
         <div class="hp-bar-wrap">
@@ -37,6 +39,8 @@
     </div>
   </header>
 
+  <div id="colResizer" class="col-resizer" title="Drag to resize panel"></div>
+
   <!-- ARENA -->
   <section class="arena" id="arena">
     <canvas id="gameCanvas"></canvas>
@@ -54,6 +58,15 @@
         <h2>STAGE CLEAR!</h2>
         <p id="clearExpText">+30 EXP earned!</p>
         <button class="sk-btn sk-btn-gold" id="btn-next-stage">▶ Next Stage</button>
+      </div>
+    </div>
+
+    <!-- Loot Popup -->
+    <div class="loot-overlay hidden" id="lootOverlay" style="position:absolute; left:50%; top:8%; transform:translateX(-50%); z-index:60;">
+      <div style="background:var(--bg2); padding:0.9rem; border-radius:8px; width:360px; box-shadow:0 12px 40px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.03);">
+        <h3 style="margin:0 0 0.6rem 0; font-family:var(--px); color:var(--gold);">Loot Found!</h3>
+        <div id="lootItems" style="max-height:220px; overflow:auto; margin-bottom:0.6rem;"></div>
+        <div style="display:flex; gap:0.6rem; justify-content:flex-end;"><button class="sk-btn sk-btn-gold" id="btnClaimAll">Claim All</button><button class="sk-btn sk-btn-outline" id="btnCloseLoot">Close</button></div>
       </div>
     </div>
 
@@ -106,6 +119,11 @@
       <div class="hint-box hidden" id="hintBox"></div>
     </div>
 
+    <div class="panel-actions">
+      <button class="action-btn btn-submit" id="btn-submit" onclick="submitCode()">▶ Run Code</button>
+      <button class="action-btn btn-skip"   id="btn-skip"   onclick="skipQuestion()">🛡️ Defend</button>
+    </div>
+
     <div class="editor-wrap">
       <div class="editor-header">
         <span class="editor-lang">🐍 Python</span>
@@ -115,10 +133,7 @@
         placeholder="# Write your Python code here…"></textarea>
     </div>
 
-    <div class="panel-actions">
-      <button class="action-btn btn-submit" id="btn-submit" onclick="submitCode()">⚔️ Attack!</button>
-      <button class="action-btn btn-skip"   id="btn-skip"   onclick="skipQuestion()">🛡️ Defend</button>
-    </div>
+    
 
     <div class="result-box hidden" id="resultBox">
       <div class="result-icon" id="resultIcon"></div>

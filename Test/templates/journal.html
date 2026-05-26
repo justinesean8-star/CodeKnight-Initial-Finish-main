@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Journal — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .journal-wrap { padding:1rem; max-width:960px; margin:0 auto; }
+    .entry { background:var(--bg2); padding:0.8rem; margin-top:0.6rem; border-radius:8px; }
+    .entry-meta { color:var(--dim); font-size:0.9rem; }
+    .new-entry { display:flex; flex-direction:column; gap:0.6rem; margin-top:1rem; }
+    textarea { width:100%; min-height:120px; padding:0.6rem; border-radius:6px; background:#07101a; color:var(--text); border:1px solid rgba(255,255,255,0.03); }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World</a></div>
+    <div class="version-tag">Journal</div>
+  </div>
+
+  <div class="journal-wrap">
+    <h2 style="font-family:var(--px);color:var(--gold)">Code Reference Journal</h2>
+    <div class="new-entry">
+      <input id="jeTitle" placeholder="Entry title" />
+      <textarea id="jeBody" placeholder="Code notes, examples, tips..."></textarea>
+      <div style="display:flex;gap:0.6rem;">
+        <button class="sk-btn sk-btn-gold" id="btnSave">Save Entry</button>
+        <button class="sk-btn sk-btn-outline" id="btnClearLocal">Clear Local</button>
+      </div>
+    </div>
+    <div id="entriesList" style="margin-top:1rem;">Loading...</div>
+  </div>
+
+  <script>
+    async function loadEntries() {
+      const listEl = document.getElementById('entriesList');
+      try {
+        const r = await fetch('/api/journal');
+        if (!r.ok) throw new Error('not-auth');
+        const j = await r.json();
+        localStorage.setItem('ck_journal', JSON.stringify(j.entries || []));
+        render(j.entries || []);
+      } catch(e) {
+        const local = JSON.parse(localStorage.getItem('ck_journal') || '[]');
+        render(local);
+      }
+    }
+
+    function render(entries) {
+      const listEl = document.getElementById('entriesList');
+      if (!entries.length) { listEl.innerHTML = '<div class="entry-meta">No entries yet</div>'; return; }
+      listEl.innerHTML = '';
+      entries.slice().reverse().forEach(en => {
+        const d = document.createElement('div'); d.className='entry';
+        d.innerHTML = '<strong>'+ (en.title || 'Untitled') +'</strong><div class="entry-meta">'+ (new Date((en.time||0)*1000).toLocaleString()) +'</div><pre style="white-space:pre-wrap;margin-top:0.6rem;">'+ (en.body || '') +'</pre>';
+        listEl.appendChild(d);
+      });
+    }
+
+    async function saveEntry() {
+      const title = document.getElementById('jeTitle').value;
+      const body = document.getElementById('jeBody').value;
+      const payload = {title, body, tags: []};
+      try {
+        const r = await fetch('/api/journal', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+        const j = await r.json();
+        if (!r.ok) { alert(j.error || 'Save failed'); return; }
+        const cur = JSON.parse(localStorage.getItem('ck_journal') || '[]'); cur.push(j.entry); localStorage.setItem('ck_journal', JSON.stringify(cur));
+        document.getElementById('jeTitle').value=''; document.getElementById('jeBody').value='';
+        loadEntries();
+      } catch(e) {
+        const cur = JSON.parse(localStorage.getItem('ck_journal') || '[]'); cur.push({id:'local'+Date.now(), title, body, time: Math.floor(Date.now()/1000)}); localStorage.setItem('ck_journal', JSON.stringify(cur)); loadEntries();
+      }
+    }
+
+    document.getElementById('btnSave').addEventListener('click', saveEntry);
+    document.getElementById('btnClearLocal').addEventListener('click', ()=>{ localStorage.removeItem('ck_journal'); loadEntries();});
+    loadEntries();
+  </script>
+</body>
+</html>

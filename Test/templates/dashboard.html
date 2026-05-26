@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .dash-wrap { padding:2rem; max-width:1000px; margin:1.6rem auto; }
+    .dash-grid { display:grid; grid-template-columns: 1fr 1fr; gap:1rem; }
+    .panel { padding:1rem; border-radius:8px; background:var(--bg2); border:1px solid rgba(255,255,255,0.03); }
+    .xp-bar { height:14px; background:rgba(255,255,255,0.04); border-radius:999px; overflow:hidden }
+    .xp-fill { height:100%; background:linear-gradient(90deg,var(--purple),#c4b5fd); width:0% }
+    textarea { width:100%; min-height:220px; background:#07101a; color:var(--text); border-radius:6px; padding:0.6rem; border:1px solid rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:1rem; display:flex; align-items:center; gap:1rem; justify-content:space-between;">
+    <div style="display:flex;gap:0.6rem;align-items:center"><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/battle">⚔️ Battle</a></div>
+    <div style="font-family:var(--px);color:var(--gold)">Dashboard</div>
+  </div>
+
+  <div class="dash-wrap">
+    <div class="dash-grid">
+      <div class="panel">
+        <h3>User</h3>
+        <div id="userInfo">Loading...</div>
+        <div style="margin-top:0.6rem">
+          <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+          <div id="xpText" style="font-size:0.85rem;color:var(--dim);margin-top:0.4rem"></div>
+        </div>
+        <div style="margin-top:0.6rem;display:flex;gap:0.6rem;">
+          <button class="sk-btn sk-btn-gold" id="btnLoadCloud">Load from Cloud</button>
+          <button class="sk-btn sk-btn-outline" id="btnSaveCloud">Save to Cloud</button>
+        </div>
+        <div style="margin-top:0.6rem;display:flex;gap:0.6rem;">
+          <button class="sk-btn sk-btn-outline" id="btnLogout">Logout</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Save State (JSON)</h3>
+        <div style="margin-bottom:0.6rem;color:var(--dim)">Paste your game state JSON here, or use Load to fetch the cloud save.</div>
+        <textarea id="stateEditor" placeholder='{"hero":"knight2","stage":1,"heroExp":0}'></textarea>
+        <div style="margin-top:0.6rem;display:flex;gap:0.6rem;">
+          <button class="sk-btn sk-btn-gold" id="btnSaveLocal">Save Locally</button>
+          <button class="sk-btn sk-btn-outline" id="btnLoadLocal">Load Local</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchMe(){
+      try{
+        const r = await fetch('/api/me'); const j = await r.json();
+        if (!j.user) { document.getElementById('userInfo').innerHTML = 'Guest'; document.getElementById('xpText').textContent='Not signed in'; return; }
+        document.getElementById('userInfo').innerHTML = '<strong>'+j.user+'</strong> · Level '+j.level;
+        const pct = Math.min(100, (j.xp || 0) % 100);
+        document.getElementById('xpFill').style.width = pct + '%';
+        document.getElementById('xpText').textContent = 'XP: '+(j.xp||0)+' · Next: '+(100 - ((j.xp||0)%100))+' XP';
+      }catch(e){ document.getElementById('userInfo').textContent = 'Error'; }
+    }
+
+    document.getElementById('btnSaveLocal').addEventListener('click', ()=>{
+      const val = document.getElementById('stateEditor').value || '{}';
+      try{ JSON.parse(val); localStorage.setItem('ck_save', val); alert('Saved locally'); }catch(e){ alert('Invalid JSON'); }
+    });
+    document.getElementById('btnLoadLocal').addEventListener('click', ()=>{
+      const v = localStorage.getItem('ck_save'); if (!v) { alert('No local save'); return; }
+      document.getElementById('stateEditor').value = v; alert('Loaded local save');
+    });
+
+    document.getElementById('btnSaveCloud').addEventListener('click', async ()=>{
+      try{
+        const payload = { save: JSON.parse(document.getElementById('stateEditor').value || '{}') };
+        const r = await fetch('/api/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const j = await r.json(); if (!r.ok) { alert(j.error || 'Save failed'); return; }
+        alert('Saved to cloud'); fetchMe();
+      }catch(e){ alert('Invalid JSON'); }
+    });
+
+    document.getElementById('btnLoadCloud').addEventListener('click', async ()=>{
+      try{ const r = await fetch('/api/load'); const j = await r.json(); if (!r.ok) { alert(j.error || 'Load failed'); return; } document.getElementById('stateEditor').value = JSON.stringify(j.save || {}, null, 2); alert('Cloud save loaded'); }catch(e){ alert('Load failed'); }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', ()=>{ window.location.href='/api/logout'; });
+
+    fetchMe();
+  </script>
+</body>
+</html>

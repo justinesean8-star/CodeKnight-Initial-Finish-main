@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .auth-box { width:360px; padding:1.4rem; border-radius:8px; background:rgba(10,12,20,0.98); border:1px solid rgba(255,255,255,0.04); }
+    .auth-box h2 { font-family: 'Press Start 2P', monospace; font-size:0.8rem; color:var(--gold); margin-bottom:0.6rem }
+    .auth-box label { display:block; font-size:0.85rem; color:var(--dim); margin-top:0.6rem }
+    .auth-box input { width:100%; padding:0.55rem; margin-top:0.25rem; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background:#07101a; color:var(--text); }
+    .auth-actions { display:flex; gap:0.6rem; margin-top:0.9rem }
+    .msg { margin-top:0.6rem; color:var(--red); font-size:0.85rem }
+  </style>
+</head>
+<body class="menu-page">
+  <div class="auth-wrap">
+    <div class="auth-box sk-panel">
+      <h2>LOGIN</h2>
+      <form id="loginForm">
+        <label>Username</label>
+        <input id="username" autocomplete="username" />
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" />
+        <div class="auth-actions">
+          <button class="sk-btn sk-btn-gold" type="submit">Sign In</button>
+          <a class="sk-btn sk-btn-outline" href="/register">Register</a>
+        </div>
+      </form>
+      <div class="msg" id="msg"></div>
+      <div style="margin-top:0.6rem;font-size:0.82rem;color:var(--dim)">Or <a href="/">Back to Menu</a></div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
+      const msg = document.getElementById('msg'); msg.textContent = '';
+      if (!u || !p) { msg.textContent = 'Enter username and password'; return; }
+      try {
+        const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u,password:p}) });
+        const j = await res.json();
+        if (!res.ok) { msg.textContent = j.error || 'Login failed'; return; }
+        window.location.href = '/dashboard';
+      } catch (err) { msg.textContent = 'Network error'; }
+    });
+  </script>
+</body>
+</html>

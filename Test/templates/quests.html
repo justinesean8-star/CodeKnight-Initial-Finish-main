@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quests — CodeKnight</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <style>
+    .quests-wrap { padding:1rem; }
+    .quest { background:var(--bg2); padding:0.8rem; border-radius:8px; margin-top:0.6rem; display:flex; justify-content:space-between; align-items:center; }
+    .qmeta { color:var(--dim); font-size:0.9rem }
+  </style>
+</head>
+<body class="menu-page">
+  <div style="padding:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+    <div><a class="sk-btn sk-btn-outline" href="/">🏠 Menu</a> <a class="sk-btn sk-btn-outline" href="/world">🗺 World</a></div>
+    <div class="version-tag">Daily Quests</div>
+  </div>
+
+  <div class="quests-wrap">
+    <div style="display:flex; gap:0.6rem;"></div>
+    <div id="questsList">Loading quests...</div>
+  </div>
+
+  <script>
+    async function loadQuests(){
+      const el = document.getElementById('questsList');
+      try{
+        const r = await fetch('/api/quests');
+        const j = await r.json();
+        render(j.quests||[]);
+      }catch(e){
+        const local = JSON.parse(localStorage.getItem('ck_quests')||'[]'); render(local);
+      }
+    }
+
+    function render(list){
+      const el = document.getElementById('questsList'); el.innerHTML='';
+      if (!list.length) { el.innerHTML = '<div class="qmeta">No quests available</div>'; return; }
+      list.forEach(q=>{
+        const d = document.createElement('div'); d.className='quest';
+        const left = document.createElement('div'); left.innerHTML = '<strong>'+q.title+'</strong><div class="qmeta">'+q.desc+' • +' + (q.xp||0) + ' XP</div>';
+        const right = document.createElement('div');
+        const btn = document.createElement('button'); btn.className='sk-btn sk-btn-gold';
+        btn.textContent = q.completed? 'Completed' : 'Complete'; btn.disabled = !!q.completed;
+        btn.onclick = ()=> completeQuest(q.id);
+        right.appendChild(btn);
+        d.appendChild(left); d.appendChild(right);
+        el.appendChild(d);
+      });
+    }
+
+    async function completeQuest(id){
+      try{
+        const r = await fetch('/api/quests/complete', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id})});
+        const j = await r.json();
+        if (!r.ok) { alert(j.error || 'Could not complete quest'); return; }
+        alert('Quest completed! +' + (j.xp||0) + ' XP');
+        loadQuests();
+      }catch(e){
+        // local fallback
+        const cur = JSON.parse(localStorage.getItem('ck_quests')||'[]');
+        const idx = cur.findIndex(q=>q.id===id);
+        if (idx===-1) cur.push({id:id, completed:true}); else cur[idx].completed = true;
+        localStorage.setItem('ck_quests', JSON.stringify(cur)); alert('Quest completed locally'); loadQuests();
+      }
+    }
+
+    loadQuests();
+  </script>
+</body>
+</html>

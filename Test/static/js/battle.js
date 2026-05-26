@@ -104,19 +104,41 @@ function loadAudio(key, path) {
   });
 }
 
+// Settings-aware sound playback
+window.CK_SETTINGS = JSON.parse(localStorage.getItem('ck_settings') || JSON.stringify({ musicOn: true, musicVolume: 0.6, sfxOn: true, sfxVolume: 0.9 }));
+
+async function syncSettingsFromServer() {
+  try {
+    const r = await fetch('/api/settings');
+    if (r.ok) {
+      const j = await r.json();
+      if (j.settings) {
+        window.CK_SETTINGS = Object.assign({}, window.CK_SETTINGS, j.settings);
+        localStorage.setItem('ck_settings', JSON.stringify(window.CK_SETTINGS));
+      }
+    }
+  } catch (e) {}
+}
+syncSettingsFromServer();
+
 function playSound(key, opts = {}) {
   const a = AUDIOS[key];
   if (!a) return;
-  // For overlapping SFX, clone the node so sounds can layer
+  const settings = window.CK_SETTINGS || { musicOn: true, musicVolume: 0.6, sfxOn: true, sfxVolume: 0.9 };
+  const isMusic = String(key).includes('music');
+  if (isMusic && !settings.musicOn) return;
+  if (!isMusic && !settings.sfxOn) return;
+  const volPref = isMusic ? (settings.musicVolume ?? 1.0) : (settings.sfxVolume ?? 1.0);
+  const effectiveVol = (opts.volume ?? 1.0) * volPref;
   if (opts.clone) {
     try {
       const c = a.cloneNode();
-      c.volume = opts.volume ?? 1.0;
+      c.volume = effectiveVol;
       c.play().catch(()=>{});
     } catch (e) {}
   } else {
     try {
-      a.volume = opts.volume ?? a.volume ?? 1.0;
+      a.volume = effectiveVol;
       a.currentTime = opts.restart ? 0 : a.currentTime;
       a.loop = !!opts.loop;
       a.play().catch(()=>{});
@@ -235,6 +257,7 @@ let G = {
   timerLeft: baseTimer + heroData.timerBonus,
   timerInterval: null,
   busy: false,
+  gameOver: false,
   timeScale: 1.0,
 };
 
@@ -636,12 +659,13 @@ function tickTimer() {
 }
 
 function timeExpired() {
-  if (G.busy) return;
+  if (G.busy || G.gameOver) return;
   doHeroDamage(25);
   setTimeout(loadQuestion, 1800);
 }
 
 async function loadQuestion() {
+  if (G.gameOver) return;
   hideResult();
   document.getElementById('codeEditor').value = '';
   document.getElementById('hintBox').classList.add('hidden');
@@ -661,6 +685,7 @@ async function loadQuestion() {
 
 // ── Combat Logic ──
 async function submitCode() {
+  if (G.gameOver) return;
   if (G.busy) return;
   const code = document.getElementById('codeEditor').value.trim();
   if (!code) { alert('Write Python code first!'); return; }
@@ -842,7 +867,7 @@ function spawnNextEnemy() {
 }
 
 function skipQuestion() {
-  if (G.busy) return;
+  if (G.gameOver || G.busy) return;
   document.getElementById('codeEditor').blur();
   clearInterval(G.timerInterval);
   doHeroDamage(20);
@@ -872,6 +897,75 @@ function stageClear() {
   clearInterval(G.timerInterval);
   document.getElementById('stageClearOverlay').classList.remove('hidden');
   playSound('sfx_level_complete', { clone: true, volume: 0.9 });
+  // generate loot for this stage (async)
+  try { generateLootForStage(); } catch(e) {}
+}
+
+
+async function generateLootForStage() {
+  try {
+    const count = Math.max(1, Math.floor(G.stage / 2));
+    const res = await fetch('/api/loot/generate', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ stage: G.stage, count })
+    });
+    if (!res.ok) return;
+    const j = await res.json();
+    const loot = j.loot || [];
+    if (loot.length) showLootPopup(loot);
+  } catch (e) { /* ignore */ }
+}
+
+
+function showLootPopup(loot) {
+  let overlay = document.getElementById('lootOverlay');
+  if (!overlay) return;
+  const itemsEl = document.getElementById('lootItems');
+  itemsEl.innerHTML = '';
+  loot.forEach(it => {
+    const row = document.createElement('div');
+    row.style.display = 'flex'; row.style.justifyContent = 'space-between'; row.style.alignItems = 'center'; row.style.marginBottom = '0.5rem';
+    const left = document.createElement('div'); left.innerHTML = `<strong>${it.name}</strong><div style="color:var(--dim)">${it.rarity} ×${it.qty}</div>`;
+    const btn = document.createElement('button'); btn.className = 'sk-btn sk-btn-outline'; btn.textContent = 'Claim';
+    btn.onclick = async () => {
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/inventory/add', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({item: it})});
+        if (!r.ok) throw new Error('server');
+        alert('Added to inventory');
+      } catch (e) {
+        // fallback to local storage
+        const cur = JSON.parse(localStorage.getItem('ck_inventory') || '[]');
+        let found = false;
+        for (let k = 0; k < cur.length; k++) {
+          if (cur[k].id === it.id) { cur[k].qty = (cur[k].qty || 1) + it.qty; found = true; break; }
+        }
+        if (!found) cur.push(it);
+        localStorage.setItem('ck_inventory', JSON.stringify(cur));
+        alert('Saved to local inventory');
+      }
+    };
+    row.appendChild(left); row.appendChild(btn);
+    itemsEl.appendChild(row);
+  });
+  overlay.classList.remove('hidden');
+  document.getElementById('btnCloseLoot').onclick = () => { overlay.classList.add('hidden'); };
+  document.getElementById('btnClaimAll').onclick = async () => {
+    for (const it of loot) {
+      try {
+        const r = await fetch('/api/inventory/add', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({item: it})});
+        if (!r.ok) throw new Error('server');
+      } catch (e) {
+        const cur = JSON.parse(localStorage.getItem('ck_inventory') || '[]');
+        let found = false;
+        for (let k = 0; k < cur.length; k++) { if (cur[k].id === it.id) { cur[k].qty = (cur[k].qty || 1) + it.qty; found = true; break; } }
+        if (!found) cur.push(it);
+        localStorage.setItem('ck_inventory', JSON.stringify(cur));
+      }
+    }
+    alert('Loot claimed');
+    overlay.classList.add('hidden');
+  };
 }
 
 document.getElementById('btn-next-stage').addEventListener('click', () => {
@@ -884,14 +978,90 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
 });
 
 function gameOver() {
+  if (G.gameOver) return;
+  G.gameOver = true;
   clearInterval(G.timerInterval);
   // show death animation
   A.heroAnim = 'death';
   A.heroAnimFrame = 0;
   document.getElementById('gameOverOverlay').classList.remove('hidden');
+
+  // Disable editor and interactive buttons so user cannot continue attacking
+  const codeEditorEl = document.getElementById('codeEditor');
+  if (codeEditorEl) { codeEditorEl.blur(); codeEditorEl.disabled = true; codeEditorEl.setAttribute('aria-disabled', 'true'); }
+  const btnSubmit = document.getElementById('btn-submit');
+  const btnSkip = document.getElementById('btn-skip');
+  const hintBtn = document.getElementById('hintBtn');
+  const clearBtn = document.querySelector('.clear-code-btn');
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnSkip) btnSkip.disabled = true;
+  if (hintBtn) hintBtn.disabled = true;
+  if (clearBtn) clearBtn.disabled = true;
+
+  // Remove bullet-time visual state and move focus to restart
+  const bto = document.getElementById('bulletTimeOverlay');
+  if (bto) bto.classList.add('hidden');
+  const arenaEl = document.getElementById('arena');
+  if (arenaEl) arenaEl.classList.remove('bullet-time-active');
+  const restartBtn = document.getElementById('btn-restart');
+  if (restartBtn) restartBtn.focus();
+
   playSound('sfx_defeated', { clone: true, volume: 0.95 });
 }
 document.getElementById('btn-restart').addEventListener('click', () => { playSound('ui_click', { clone: true, volume: 0.9 }); location.reload(); });
+
+// --- Save / Load integration (cloud or local fallback)
+async function saveProgress() {
+  const payload = {
+    save: {
+      hero: localStorage.getItem('hero') || heroKey,
+      difficulty: G.difficulty,
+      stage: G.stage,
+      heroHp: Math.max(0, Math.floor(G.heroHp)),
+      heroExp: G.heroExp,
+      heroLevel: G.heroLevel
+    },
+    xp: G.heroExp,
+    level: G.heroLevel
+  };
+  try {
+    const res = await fetch('/api/save', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if (res.status === 401) {
+      localStorage.setItem('ck_save', JSON.stringify(payload.save));
+      alert('Not signed in — saved locally');
+      return;
+    }
+    const j = await res.json();
+    if (!res.ok) { alert(j.error || 'Save failed'); return; }
+    alert('Saved to cloud');
+  } catch (e) { localStorage.setItem('ck_save', JSON.stringify(payload.save)); alert('Network error — saved locally'); }
+}
+
+async function loadProgress() {
+  try {
+    const res = await fetch('/api/load');
+    if (res.status === 401) {
+      const v = localStorage.getItem('ck_save'); if (!v) { alert('No local save'); return; }
+      applySave(JSON.parse(v)); alert('Loaded local save'); return;
+    }
+    const j = await res.json(); if (!res.ok) { alert(j.error || 'Load failed'); return; }
+    applySave(j.save || {}); if (j.xp) G.heroExp = j.xp; if (j.level) G.heroLevel = j.level; updateHUD(); alert('Loaded cloud save');
+  } catch (e) { const v = localStorage.getItem('ck_save'); if (!v) { alert('Load failed'); return; } applySave(JSON.parse(v)); alert('Loaded local save'); }
+}
+
+function applySave(save) {
+  if (!save) return;
+  if (save.hero) localStorage.setItem('hero', save.hero);
+  if (save.difficulty) { localStorage.setItem('difficulty', save.difficulty); G.difficulty = save.difficulty; }
+  if (typeof save.stage !== 'undefined') G.stage = save.stage;
+  if (typeof save.heroHp !== 'undefined') G.heroHp = save.heroHp;
+  if (typeof save.heroExp !== 'undefined') G.heroExp = save.heroExp;
+  if (typeof save.heroLevel !== 'undefined') G.heroLevel = save.heroLevel;
+  updateHUD();
+}
+
+document.getElementById('btn-save-state')?.addEventListener('click', ()=>{ saveProgress(); });
+document.getElementById('btn-load-state')?.addEventListener('click', ()=>{ loadProgress(); });
 
 // ── Main Render & Physics Loop ──
 function loop(timestamp) {
@@ -1205,3 +1375,33 @@ async function init() {
 }
 
 init();
+
+// Resizer for arena / panel split (CodeCombat-like adjustable layout)
+(function setupResizer(){
+  const resizer = document.getElementById('colResizer');
+  if (!resizer) return;
+  const docEl = document.documentElement;
+  const saved = localStorage.getItem('ck_panel_w');
+  if (saved) docEl.style.setProperty('--panel-w', saved);
+  let dragging = false;
+  let lastW = parseInt((getComputedStyle(docEl).getPropertyValue('--panel-w')||'520').replace('px','')) || 520;
+
+  resizer.addEventListener('mousedown', (e) => {
+    dragging = true; e.preventDefault(); document.body.classList.add('resizing');
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const min = 320;
+    const max = Math.max(360, window.innerWidth - 320);
+    let newW = Math.round(window.innerWidth - e.clientX);
+    newW = Math.max(min, Math.min(max, newW));
+    docEl.style.setProperty('--panel-w', newW + 'px');
+    lastW = newW;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return; dragging = false; document.body.classList.remove('resizing');
+    try { localStorage.setItem('ck_panel_w', lastW + 'px'); } catch (e) {}
+  });
+})();
