@@ -21,7 +21,8 @@
         "daily_1": {
           "completed": true
         }
-      }
+      },
+      "inventory": []
     }
   }
 }

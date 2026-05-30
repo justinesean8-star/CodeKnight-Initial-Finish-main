@@ -1,0 +1,206 @@
+/* Codedknight - minimal pixel-style globals (cleaned from NextJS theme)
+   This file provides the pixel-panel and button styles used by the new
+   main menu HTML port. It intentionally avoids Tailwind directives.
+*/
+@font-face {
+  font-family: 'PixelFont';
+  src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+:root {
+  --ck-bg: #071028;
+  --ck-gold: #ffd166;
+  --ck-gold-dark: #c98b00;
+  --ck-blue: #60d4ff;
+  --ck-text: #e7f6ff;
+  --ck-dim: #97a9b9;
+  --ck-dark: #071018;
+}
+
+/* Basic resets scoped for the CK UI */
+#mainMenu, #mainMenu * { box-sizing: border-box; }
+
+/* Pixel button */
+.pixel-btn {
+  image-rendering: pixelated;
+  font-family: 'PixelFont', 'Press Start 2P', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 10px 14px;
+  border: 4px solid transparent;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  transition: transform 0.06s ease, filter 0.06s ease;
+  white-space: nowrap;
+}
+.pixel-btn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.pixel-btn:active { transform: translateY(1px); }
+
+.pixel-btn-gold {
+  background: linear-gradient(135deg,#b87800 0%, var(--ck-gold) 60%, var(--ck-gold-dark) 100%);
+  color: #241200;
+  box-shadow: inset -4px -4px 0 var(--ck-dark), inset 4px 4px 0 rgba(255,255,255,0.06), 6px 6px 0 rgba(0,0,0,0.5);
+}
+.pixel-btn-primary {
+  background: var(--ck-blue);
+  color: #041022;
+  box-shadow: inset -3px -3px 0 rgba(0,0,0,0.45), inset 3px 3px 0 rgba(255,255,255,0.06), 4px 4px 0 rgba(0,0,0,0.5);
+}
+.pixel-btn-secondary {
+  background: rgba(7,16,40,0.12);
+  color: var(--ck-text);
+  border: 1px solid rgba(0,0,0,0.14);
+  box-shadow: inset -3px -3px 0 rgba(0,0,0,0.45), inset 3px 3px 0 rgba(255,255,255,0.03), 4px 4px 0 rgba(0,0,0,0.45);
+}
+
+/* Pixel panel */
+.pixel-panel {
+  background: linear-gradient(180deg, rgba(7,16,40,0.22), rgba(16,39,51,0.12));
+  border-radius: 8px;
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.6);
+  border: 2px solid rgba(0,0,0,0.14);
+}
+
+/* small helpers used by the HTML port */
+.ck-main-menu { padding: 2rem 1rem; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ck-header { display:flex; align-items:center; justify-content:center; gap:1rem; margin-bottom:1.25rem; }
+.ck-knight { width:96px; height:96px; object-fit:contain; image-rendering:pixelated; }
+.ck-panel { padding: 16px; max-width: 420px; width: calc(100% - 32px); }
+.ck-btn { width:100%; font-size:12px; padding:12px 14px; border-radius:6px; }
+.text-muted-foreground { color: var(--ck-dim); }
+
+/* Small responsive tweaks */
+@media (max-width: 720px) {
+  .ck-header { flex-direction: column; gap: 0.4rem; }
+  .ck-knight { width:72px; height:72px; }
+}
+
+/* Pixel float animation */
+@keyframes ck-float { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} }
+.pixel-float { animation: ck-float 3s ease-in-out infinite; }
+
+/* Dashboard toggle button (left side) */
+.ck-dashboard-btn {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 120;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: 8px;
+  background: linear-gradient(180deg, rgba(7,16,40,0.22), rgba(16,39,51,0.12));
+  border: 2px solid rgba(0,0,0,0.14);
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.6);
+  color: var(--ck-gold);
+  font-family: 'PixelFont', 'Press Start 2P', monospace;
+}
+.ck-dashboard-btn svg { width: 20px; height: 20px; display: block; }
+.ck-dashboard-btn .ck-db-label { display: none; font-size: 10px; color: var(--ck-gold); }
+.ck-dashboard-btn:hover .ck-db-label { display: block; }
+.ck-dashboard-btn:focus { outline: 2px solid rgba(255,209,102,0.18); }
+
+/* Vertical stacked menu buttons (pixel 3D look) */
+.menu-buttons { display:flex; flex-direction:column; gap:12px; }
+.ck-vertical-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:100%; padding:14px 18px; font-family:'PixelFont','Press Start 2P',monospace;
+  font-weight:700; font-size:14px; letter-spacing:3px; border-radius:8px;
+  border:6px solid rgba(0,0,0,0.9);
+  position:relative; overflow:visible; text-shadow:none; cursor:pointer;
+  box-shadow: 10px 10px 0 rgba(0,0,0,0.95);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.ck-vertical-btn:active { transform: translateY(2px); box-shadow: 6px 6px 0 rgba(0,0,0,0.9); }
+.ck-vertical-btn.primary {
+  background: linear-gradient(180deg,#ffd166,#f4b400);
+  color:#241200;
+}
+.ck-vertical-btn.primary::after {
+  content: '';
+  position: absolute; left: 12px; right: 12px; bottom: -8px; height: 8px;
+  background: rgba(0,0,0,0.98); border-radius:2px;
+}
+.ck-vertical-btn.secondary {
+  background: linear-gradient(180deg, rgba(7,16,40,0.6), rgba(16,39,51,0.6));
+  color: var(--ck-text);
+  border-color: rgba(0,0,0,0.82);
+}
+.menu-buttons .ck-vertical-btn + .ck-vertical-btn { margin-top:6px; }
+
+/* Tighter styling for the small auth buttons row */
+.auth-row { display:flex; gap:8px; }
+.auth-row .ck-vertical-btn { padding:10px 12px; font-size:12px; }
+
+/* Dashboard overlay panel */
+.ck-dashboard-panel {
+  position: fixed; right: 16px; top: 16px; bottom: 16px;
+  width: 420px; max-width: calc(100% - 32px);
+  z-index: 240;
+  display: flex; align-items: flex-start; justify-content: flex-end;
+}
+.ck-dashboard-panel .ck-dashboard-inner {
+  width: 100%; background: linear-gradient(180deg, rgba(7,16,40,0.95), rgba(16,39,51,0.95));
+  border-radius: 6px; padding: 12px; box-shadow: 12px 12px 0 rgba(0,0,0,0.95);
+  border: 4px solid rgba(0,0,0,0.85);
+  color: var(--ck-text);
+}
+.ck-dashboard-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.ck-dashboard-user { display:flex; align-items:center; gap:8px; }
+.ck-db-avatar { width:36px; height:36px; border-radius:6px; object-fit:cover; }
+.ck-db-user-meta { display:flex; flex-direction:column; font-family: 'PixelFont', 'Press Start 2P', monospace; }
+.ck-db-username { font-weight:700; color:var(--ck-gold); }
+.ck-db-level { font-size:11px; color:var(--ck-dim); }
+.ck-db-gold { font-weight:700; color:var(--ck-gold); margin-left:8px; }
+.ck-db-close { background:transparent; border:2px solid rgba(0,0,0,0.5); padding:6px 8px; cursor:pointer; color:var(--ck-gold); border-radius:4px; }
+.ck-dashboard-tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.ck-db-tab { background: rgba(7,16,40,0.7); padding:8px 10px; border-radius:6px; border:2px solid rgba(0,0,0,0.6); color:var(--ck-dim); font-family: 'PixelFont', 'Press Start 2P', monospace; cursor:pointer; }
+.ck-db-tab.active { background: linear-gradient(180deg, rgba(255,209,102,0.08), rgba(96,212,255,0.04)); color: var(--ck-gold); }
+.ck-dashboard-content { max-height: calc(100vh - 220px); overflow:auto; padding:8px; border-top:1px solid rgba(255,255,255,0.02); }
+.ck-players-list { display:flex; flex-direction:column; gap:8px; }
+.ck-player { display:flex; align-items:center; gap:8px; padding:8px; background: rgba(0,0,0,0.25); border-radius:6px; border:2px solid rgba(0,0,0,0.6); }
+.ck-player-left img { width:42px; height:42px; object-fit:cover; border-radius:6px; }
+.ck-player-info { flex:1; display:flex; flex-direction:column; }
+.ck-player-name { color:var(--ck-gold); font-weight:700; }
+.ck-player-meta { color:var(--ck-dim); font-size:12px; }
+.ck-player-tag { color:#4ef08a; font-size:18px; }
+
+
+/* Title tweaks to match reference (larger pixel title with glow) */
+.ck-main-menu .pixel-title {
+  font-size: clamp(40px, 8vw, 64px);
+  letter-spacing: 6px;
+  line-height: 1;
+  color: var(--ck-gold);
+  text-shadow: 0 0 28px rgba(255,209,102,0.88), 4px 4px 0 #6b4400;
+}
+
+/* Primary button: stronger 3D pixel look with top highlight and deep drop shadow */
+.ck-vertical-btn.primary {
+  background: linear-gradient(180deg,#ffd166 0%, #f4b400 60%);
+  color: #241200;
+  border-width: 8px; /* thicker outer border for pixel feel */
+  box-shadow: 12px 12px 0 rgba(0,0,0,0.96);
+  font-size: 15px;
+  letter-spacing: 4px;
+}
+.ck-vertical-btn.primary::before {
+  content: '';
+  position: absolute; left: 8px; right: 8px; top: 8px;
+  height: 10px; border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.04));
+  pointer-events: none;
+}
+.ck-vertical-btn.primary::after {
+  content: '';
+  position: absolute; left: 12px; right: 12px; bottom: -10px; height: 10px;
+  background: rgba(0,0,0,0.98); border-radius: 2px; pointer-events: none;
+}
+.ck-vertical-btn.primary:active { transform: translateY(4px); box-shadow: 6px 6px 0 rgba(0,0,0,0.92); }
+
+/* Small polish: slightly heavier secondary buttons */
+.ck-vertical-btn.secondary { box-shadow: 8px 8px 0 rgba(0,0,0,0.92); border-width: 6px; }
+
+
+

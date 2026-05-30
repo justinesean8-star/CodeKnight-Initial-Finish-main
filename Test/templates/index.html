@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CodeKnight</title>
   <meta name="description" content="Learn Python by fighting dungeon monsters! An educational RPG coding game." />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/flat_ui.css" />
+  <link rel="stylesheet" href="/static/css/ck_globals.css" />
 </head>
 
 <body class="menu-page">
@@ -16,81 +17,71 @@
 
   <div class="menu-wrap codecombat-hero">
     <div class="menu-hero" id="mainMenu">
-      <div class="hero-left">
-        <div class="hero-heading">
-          <div class="swords-icon">⚔️</div>
-          <h1 class="pixel-title">CODE<br/>KNIGHT</h1>
-          <p class="pixel-sub">solve python · slay dungeons</p>
+      <div class="ck-main-menu" role="region" aria-label="Main Menu">
+        <button class="ck-dashboard-btn" type="button" onclick="toggleDashboard()" aria-label="Open Dashboard">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>
+        </button>
+        <div class="ck-header">
+          <img src="/static/image/Characters/Knight_1.webp" alt="Pixel Knight" class="ck-knight pixel-float" />
+          <div style="text-align:center;">
+            <h1 class="pixel-title" style="margin:0;">CODE KNIGHT</h1>
+            <p class="pixel-sub" style="margin-top:0.6rem;">&gt;&gt;&gt; PRESS START &lt;&lt;&lt;</p>
+          </div>
+          <div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 20l16-16" stroke="#ffd166" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 6l4-4" stroke="#ffd166" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
         </div>
-        <div class="hero-art-wrap">
-          <img src="/static/image/Characters/Knight_1.webp" alt="Elite Knight" class="hero-art pixel-img" />
-          <div class="hero-art-decor" aria-hidden="true"></div>
+
+        <div class="pixel-panel ck-panel" style="margin:0 auto;">
+          <div class="menu-buttons">
+            <button class="ck-vertical-btn primary" onclick="showModeSelect()" aria-label="New Game"><span data-pixel-icon="newgame" class="ck-icon"></span> NEW GAME</button>
+            <button class="ck-vertical-btn secondary" onclick="showHowTo()"><span data-pixel-icon="book" class="ck-icon"></span> HOW TO PLAY</button>
+            <button class="ck-vertical-btn secondary" onclick="location.href='/settings'"><span data-pixel-icon="settings" class="ck-icon"></span> SETTINGS</button>
+            <button class="ck-vertical-btn secondary" onclick="console.log('Developers')"><span data-pixel-icon="sword" class="ck-icon"></span> DEVELOPERS</button>
+
+            <div style="display:flex;align-items:center;gap:8px;margin:8px 0;">
+              <div style="flex:1;height:2px;background:rgba(255,209,102,0.06);"></div>
+              <div style="font-size:11px;color:var(--dim);">OR</div>
+              <div style="flex:1;height:2px;background:rgba(255,209,102,0.06);"></div>
+            </div>
+
+            <div class="auth-row">
+              <a class="ck-vertical-btn secondary" href="/login" style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;"><span data-pixel-icon="key" class="ck-icon"></span> LOG IN</a>
+              <a class="ck-vertical-btn secondary" href="/register" style="flex:1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;"><span data-pixel-icon="user" class="ck-icon"></span> REGISTER</a>
+            </div>
+          </div>
         </div>
+
+        <p style="margin-top:12px;color:var(--dim);font-size:12px;text-align:center;">© 2024 CODE KNIGHT STUDIOS</p>
       </div>
+    </div>
 
-      <div class="hero-right">
-        <div class="floating-actions" role="navigation" aria-label="Main actions">
-          <a class="float-btn float-large" href="/battle" data-tooltip="Play" title="Play">
-            <div class="float-ico">
-              <img src="/static/image/Characters/Knight.png" alt="Play" class="pix-icon"/>
-            </div>
-            <div class="float-label">Play</div>
-          </a>
-          <a class="float-btn" href="/world" data-tooltip="World Map" title="World Map">
-            <div class="float-ico">
-              <img src="/static/image/floors.png" alt="World" class="pix-icon"/>
-            </div>
-            <div class="float-label">World</div>
-          </a>
-          <a class="float-btn" href="/skill-tree" data-tooltip="Skill Tree" title="Skill Tree">
-            <div class="float-ico">
-              <img src="/static/image/Characters/New%20Characters/Witch_weapon.png" alt="Skills" class="pix-icon"/>
-            </div>
-            <div class="float-label">Skills</div>
-          </a>
-          <a class="float-btn" href="/inventory" data-tooltip="Inventory" title="Inventory">
-            <div class="float-ico">
-              <img src="/static/image/%E6%9C%A8%E7%AE%B1.png" alt="Inventory" class="pix-icon"/>
-            </div>
-            <div class="float-label">Inventory</div>
-          </a>
-          <a class="float-btn" href="/quests" data-tooltip="Daily Quests" title="Daily Quests">
-            <div class="float-ico">
-              <img src="/static/image/1.png" alt="Quests" class="pix-icon"/>
-            </div>
-            <div class="float-label">Quests</div>
-          </a>
-          <a class="float-btn" href="/journal" data-tooltip="Journal" title="Journal">
-            <div class="float-ico">
-              <img src="/static/image/Characters/New%20Characters/Assassin_weapon.png" alt="Journal" class="pix-icon"/>
-            </div>
-            <div class="float-label">Journal</div>
-          </a>
-          <a class="float-btn" href="/leaderboard" data-tooltip="Leaderboard" title="Leaderboard">
-            <div class="float-ico">
-              <img src="/static/image/Enemy/Mummy.png" alt="Leaderboard" class="pix-icon"/>
-            </div>
-            <div class="float-label">Leaderboard</div>
-          </a>
-          <a class="float-btn" href="/settings" data-tooltip="Settings" title="Settings">
-            <div class="float-ico">
-              <img src="/static/image/OldPistol.png" alt="Settings" class="pix-icon"/>
-            </div>
-            <div class="float-label">Settings</div>
-          </a>
-          {% if session.get('user') %}
-            <a class="float-btn" href="/dashboard" title="Dashboard"><div class="float-ico">👤</div><div class="float-label">Dashboard</div></a>
-            <a class="float-btn" href="/api/logout" title="Logout"><div class="float-ico">🔒</div><div class="float-label">Logout</div></a>
-          {% else %}
-            <a class="float-btn" href="/login" title="Login"><div class="float-ico">🔑</div><div class="float-label">Login</div></a>
-            <a class="float-btn" href="/register" title="Register"><div class="float-ico">✍️</div><div class="float-label">Register</div></a>
-          {% endif %}
+    <!-- Dashboard overlay (ported) -->
+    <div id="ckDashboardOverlay" class="ck-dashboard-panel hidden" aria-hidden="true">
+      <div class="ck-dashboard-inner pixel-panel">
+        <div class="ck-dashboard-header">
+          <h2>DASHBOARD</h2>
+          <div class="ck-dashboard-user">
+            <img src="/ck-assets/placeholder-user.jpg" alt="user" class="ck-db-avatar" />
+            <div class="ck-db-user-meta"><div class="ck-db-username">HERO_ONE</div><div class="ck-db-level">LVL 42</div></div>
+            <div class="ck-db-gold">1250 GOLD</div>
+            <button class="ck-db-close" onclick="toggleDashboard()">X</button>
+          </div>
         </div>
 
-        <div class="secondary-actions">
-          <button class="sk-btn sk-btn-outline" onclick="showHowTo()">How to Play</button>
-          <button class="sk-btn sk-btn-gold" onclick="showModeSelect()">New Game</button>
+        <div class="ck-dashboard-tabs">
+          <button class="ck-db-tab active" data-tab="players"><span data-pixel-icon="players"></span> PLAYERS</button>
+          <button class="ck-db-tab" data-tab="journal"><span data-pixel-icon="journal"></span> JOURNAL</button>
+          <button class="ck-db-tab" data-tab="skills"><span data-pixel-icon="tree"></span> SKILLS</button>
+          <button class="ck-db-tab" data-tab="items"><span data-pixel-icon="chest"></span> ITEMS</button>
+          <button class="ck-db-tab" data-tab="ranks"><span data-pixel-icon="trophy"></span> RANKS</button>
+          <button class="ck-db-tab" data-tab="quests"><span data-pixel-icon="quest"></span> QUESTS</button>
         </div>
+
+        <div id="ckDashboardContent" class="ck-dashboard-content"></div>
       </div>
     </div>
 
@@ -113,199 +104,140 @@
 
     <!-- MODE SELECTION PANEL -->
     <div class="sk-panel hidden" id="modePanel">
-      <h2 class="panel-title">— CHOOSE DIFFICULTY —</h2>
+      <h2 class="panel-title">CHOOSE DIFFICULTY</h2>
+      
       <div class="mode-panel-layout">
-
         <!-- Knight image on the left -->
         <div class="mode-knight-col">
           <div class="mode-knight-glow"></div>
-          <img src="/static/image/Characters/Knight_1.webp" alt="Knight" class="mode-knight-img pixel-img" />
-          <div class="mode-knight-label">CHOOSE YOUR PATH</div>
+          <img src="/static/image/Characters/Knight_1.webp" alt="Knight" class="mode-knight-img" />
+          <div class="mode-knight-subtitle">CHOOSE YOUR PATH</div>
         </div>
 
         <!-- Difficulty cards on the right -->
         <div class="mode-cards-col">
           <div class="diff-cards-grid">
-
             <div class="diff-card diff-card-easy" id="mode-easy" onclick="selectMode('easy')">
               <div class="diff-card-glow"></div>
+              <div class="diff-card-title">EASY</div>
               <div class="diff-card-icon">🌿</div>
-              <div class="diff-card-label">EASY</div>
               <div class="diff-card-tag">Beginner</div>
               <ul class="diff-card-perks">
-                <li>⏱ 60s per challenge</li>
+                <li>⏱ 60s / challenge</li>
                 <li>💡 3 hints available</li>
-                <li>❤️ No HP penalty on skip</li>
+                <li>❤️ No HP penalty</li>
               </ul>
-              <div class="diff-card-check" id="check-easy">✔</div>
             </div>
 
             <div class="diff-card diff-card-normal" id="mode-normal" onclick="selectMode('normal')">
               <div class="diff-card-glow"></div>
+              <div class="diff-card-title">NORMAL</div>
               <div class="diff-card-icon">⚔️</div>
-              <div class="diff-card-label">NORMAL</div>
               <div class="diff-card-tag">Adventurer</div>
               <ul class="diff-card-perks">
-                <li>⏱ 45s per challenge</li>
+                <li>⏱ 45s / challenge</li>
                 <li>💡 1 hint available</li>
                 <li>❤️ Skip costs 10 HP</li>
               </ul>
-              <div class="diff-card-check" id="check-normal">✔</div>
             </div>
 
             <div class="diff-card diff-card-expert" id="mode-expert" onclick="selectMode('expert')">
               <div class="diff-card-glow"></div>
+              <div class="diff-card-title">EXPERT</div>
               <div class="diff-card-icon">🔥</div>
-              <div class="diff-card-label">EXPERT</div>
               <div class="diff-card-tag">Veteran</div>
               <ul class="diff-card-perks">
-                <li>⏱ 30s per challenge</li>
+                <li>⏱ 30s / challenge</li>
                 <li>💡 No hints</li>
                 <li>❤️ Skip costs 25 HP</li>
               </ul>
-              <div class="diff-card-check" id="check-expert">✔</div>
             </div>
 
             <div class="diff-card diff-card-insane" id="mode-insane" onclick="selectMode('insane')">
               <div class="diff-card-glow"></div>
+              <div class="diff-card-title">INSANE</div>
               <div class="diff-card-icon">💀</div>
-              <div class="diff-card-label">INSANE</div>
               <div class="diff-card-tag">Legendary</div>
               <ul class="diff-card-perks">
-                <li>⏱ 15s per challenge</li>
+                <li>⏱ 15s / challenge</li>
                 <li>💡 No hints</li>
-                <li>❤️ Wrong = instant death</li>
+                <li>❤️ Wrong = instadeath</li>
               </ul>
-              <div class="diff-card-check" id="check-insane">✔</div>
             </div>
-
           </div>
           <div class="panel-btns">
             <button class="sk-btn sk-btn-outline" onclick="backToMainFromMode()">◀ Back</button>
-            <button class="sk-btn sk-btn-gold" id="btnNextMode" onclick="showHeroSelect()" disabled>▶ Next</button>
+            <button class="sk-btn sk-btn-gold" id="btnNextMode" onclick="showHeroSelect()" disabled>Next ▶</button>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- HERO SELECTION PANEL -->
-    <div class="sk-panel hidden" id="heroPanel">
-      <h2 class="panel-title">— CHOOSE YOUR HERO —</h2>
-      <div class="hero-cards">
-        <!-- New Characters moved here -->
-        <div class="hero-card" id="card-assassin" onclick="selectHero('assassin')">
-          <img src="/static/image/Characters/New Characters/Assassin_0.gif" alt="Assassin" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">ASSASSIN</div>
-          <div class="hero-card-desc">Glass Cannon · High Crit</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:50%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:95%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:100%"></div></div>
-          </div>
-        </div>
-
-        <div class="hero-card" id="card-engineer" onclick="selectHero('engineer')">
-          <img src="/static/image/Characters/New Characters/Engineer_0.gif" alt="Engineer" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">ENGINEER</div>
-          <div class="hero-card-desc">Turrets · Utility</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:70%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:60%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:60%"></div></div>
-          </div>
-        </div>
-
-        <div class="hero-card" id="card-warliege" onclick="selectHero('warliege')">
-          <img src="/static/image/Characters/New Characters/Warliege_0.webp" alt="Warliege" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">WARLIEGE</div>
-          <div class="hero-card-desc">Tank · High HP</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:95%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:75%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:50%"></div></div>
-          </div>
-        </div>
-
-        <div class="hero-card" id="card-witch" onclick="selectHero('witch')">
-          <img src="/static/image/Characters/New Characters/Witch_0.gif" alt="Witch" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">WITCH</div>
-          <div class="hero-card-desc">Magic · Area Effects</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar"><div class="stat-fill hp-fill" style="width:60%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar"><div class="stat-fill atk-fill" style="width:85%"></div></div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar"><div class="stat-fill spd-fill" style="width:75%"></div></div>
-          </div>
-        </div>
-
-        <!-- Elite Knight -->
-        <div class="hero-card" id="card-knight2" onclick="selectHero('knight2')">
-          <img src="/static/image/Characters/Knight_1.webp" alt="Elite Knight" class="hero-card-img pixel-img" />
-          <div class="hero-card-name">ELITE KNIGHT</div>
-          <div class="hero-card-desc">Balanced · Extra Hint</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar">
-              <div class="stat-fill hp-fill" style="width:85%"></div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar">
-              <div class="stat-fill atk-fill" style="width:80%"></div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar">
-              <div class="stat-fill spd-fill" style="width:65%"></div>
-            </div>
-          </div>
-        </div>
-        <!-- Fire Knight -->
-        <div class="hero-card" id="card-fireknight" onclick="selectHero('fireknight')">
-          <img src="/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/01_idle/idle_1.png" alt="Fire Knight" class="hero-card-img pixel-img fireknight-card-img" />
-          <div class="hero-card-name">FIRE KNIGHT</div>
-          <div class="hero-card-desc">Blazing Speed · High ATK</div>
-          <div class="stat-row"><span class="stat-lbl">HP</span>
-            <div class="stat-bar">
-              <div class="stat-fill hp-fill" style="width:75%"></div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">ATK</span>
-            <div class="stat-bar">
-              <div class="stat-fill atk-fill" style="width:95%"></div>
-            </div>
-          </div>
-          <div class="stat-row"><span class="stat-lbl">SPD</span>
-            <div class="stat-bar">
-              <div class="stat-fill spd-fill" style="width:85%"></div>
-            </div>
-          </div>
-        </div>
+    <div class="ui-flat-panel sk-panel hidden" id="heroPanel">
+      <div class="panel-corner corner-tl"></div>
+      <div class="panel-corner corner-tr"></div>
+      <div class="panel-corner corner-bl"></div>
+      <div class="panel-corner corner-br"></div>
+      <div class="ui-flat-banner ui-banner-header">
+        <h2 class="panel-title">CHOOSE YOUR HERO</h2>
       </div>
-      <div class="panel-btns">
-        <button class="sk-btn sk-btn-outline" onclick="backToModeSelect()">◀ Back</button>
-        <button class="sk-btn sk-btn-gold" id="btnEnterDungeon" onclick="enterDungeon()" disabled>▶ Enter
-          Dungeon</button>
+      
+      <div class="hero-select-layout">
+        
+        <!-- Left: Stats Panel -->
+        <div class="hero-stats-col ui-flat-panel">
+          <div class="panel-corner corner-tl"></div><div class="panel-corner corner-tr"></div>
+          <div class="panel-corner corner-bl"></div><div class="panel-corner corner-br"></div>
+          
+          <div class="ui-flat-banner ui-banner-title" style="min-width: unset; padding: 1rem 2rem; margin: -1.5rem auto 1.5rem; flex-direction: row; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));">
+            <h2 class="pixel-title" id="showcase-name" style="font-size: 0.9rem; margin:0;">HERO</h2>
+          </div>
+          <div class="hero-card-desc" id="showcase-desc" style="color:#ddd; text-align: center; margin-bottom: 2rem; font-size: 0.8rem;">Description</div>
+          
+          <div class="ui-flat-stat"><span class="stat-lbl">HP</span><div class="ui-flat-bar"><div class="ui-flat-fill fill-hp" id="bar-hp" style="width:0%; transition: width 0.3s ease;"></div></div></div>
+          <div class="ui-flat-stat"><span class="stat-lbl">ATK</span><div class="ui-flat-bar"><div class="ui-flat-fill fill-atk" id="bar-atk" style="width:0%; transition: width 0.3s ease;"></div></div></div>
+          <div class="ui-flat-stat"><span class="stat-lbl">SPD</span><div class="ui-flat-bar"><div class="ui-flat-fill fill-spd" id="bar-spd" style="width:0%; transition: width 0.3s ease;"></div></div></div>
+          
+          <div class="panel-btns" style="margin-top: 3rem;">
+            <button class="ui-flat-btn btn-sec" onclick="backToModeSelect()" style="width: 100%;">
+              <span class="btn-icon-left arrow-left"></span> Back
+            </button>
+          </div>
+        </div>
+
+        <!-- Center: Art Showcase -->
+        <div class="hero-showcase-col">
+          <button class="cycle-arrow" onclick="cycleHero(-1)">◀</button>
+          <div class="showcase-img-wrap">
+            <img src="" alt="Selected Hero" class="hero-showcase-img pixel-img" id="showcase-img" />
+          </div>
+          <button class="cycle-arrow" onclick="cycleHero(1)">▶</button>
+        </div>
+
+        <!-- Right: Roster Grid -->
+        <div class="hero-roster-col ui-flat-panel" style="padding: 1.5rem !important;">
+          <div class="panel-corner corner-tl"></div><div class="panel-corner corner-tr"></div>
+          <div class="panel-corner corner-bl"></div><div class="panel-corner corner-br"></div>
+          
+          <div class="roster-grid" id="roster-grid">
+            <!-- Populated via JS -->
+          </div>
+          <div class="panel-btns hero-panel-btns" style="margin-top: 1.5rem;">
+            <button class="ui-flat-btn btn-pri" id="btnEnterDungeon" onclick="enterDungeon()" disabled style="width: 100%;">
+               START <span class="btn-icon-right check-mark"></span>
+            </button>
+          </div>
+        </div>
+        
       </div>
     </div>
 
-    <p class="version-tag">v1.0 · Python Challenge RPG</p>
+    <!-- Removed version banner per user request -->
   </div>
+
+  <script src="/static/js/pixel_icons.js"></script>
+  <script src="/static/js/ck_dashboard.js"></script>
 
   <script>
     // Starfield
@@ -331,11 +263,7 @@
       document.getElementById('heroPanel').classList.add('hidden');
     }
 
-    function showHeroSelect() {
-      if (!selectedMode) return;
-      document.getElementById('modePanel').classList.add('hidden');
-      document.getElementById('heroPanel').classList.remove('hidden');
-    }
+    // updated showHeroSelect is below with roster init
     function showHowTo() {
       document.getElementById('mainMenu').classList.add('hidden');
       document.getElementById('howtoPanel').classList.remove('hidden');
@@ -358,12 +286,79 @@
       document.getElementById('mode-' + mode).classList.add('selected');
       document.getElementById('btnNextMode').disabled = false;
     }
-    function selectHero(hero) {
-      selectedHero = hero;
-      document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('selected'));
-      document.getElementById('card-' + hero).classList.add('selected');
+    const HERO_DATA = [
+      { id: 'assassin', name: 'ASSASSIN', desc: 'Glass Cannon', hp: 50, atk: 95, spd: 100, img: '/static/image/Characters/New Characters/Assassin_0.gif' },
+      { id: 'engineer', name: 'ENGINEER', desc: 'Turrets Utility', hp: 70, atk: 60, spd: 60, img: '/static/image/Characters/New Characters/Engineer_0.gif' },
+      { id: 'warliege', name: 'WARLIEGE', desc: 'Tank High HP', hp: 95, atk: 75, spd: 50, img: '/static/image/Characters/New Characters/Warliege_0.webp' },
+      { id: 'witch', name: 'WITCH', desc: 'Magic Area', hp: 60, atk: 85, spd: 75, img: '/static/image/Characters/New Characters/Witch_0.gif' },
+      { id: 'knight2', name: 'KNIGHT', desc: 'Balanced Stats', hp: 85, atk: 80, spd: 65, img: '/static/image/Characters/Knight_1.webp' },
+      { id: 'fireknight', name: 'FIRE KNIGHT', desc: 'Blazing Speed', hp: 75, atk: 95, spd: 85, img: '/static/image/Characters/Elementals_fire_knight_FREE_v1.1/png/fire_knight/01_idle/idle_1.png' }
+    ];
+    let selectedHeroIndex = 0;
+
+    function initHeroRoster() {
+      const roster = document.getElementById('roster-grid');
+      roster.innerHTML = '';
+      HERO_DATA.forEach((hero, index) => {
+        const div = document.createElement('div');
+        div.className = 'roster-icon ui-flat-hero-card';
+        div.id = 'roster-icon-' + index;
+        div.onclick = () => selectHeroByIndex(index);
+        
+        const img = document.createElement('img');
+        img.src = hero.img;
+        img.className = 'pixel-img roster-img';
+        
+        const check = document.createElement('div');
+        check.className = 'flat-check-icon';
+        
+        div.appendChild(img);
+        div.appendChild(check);
+        roster.appendChild(div);
+      });
+      selectHeroByIndex(0);
+    }
+
+    function selectHeroByIndex(index) {
+      if (index < 0) index = HERO_DATA.length - 1;
+      if (index >= HERO_DATA.length) index = 0;
+      selectedHeroIndex = index;
+      const hero = HERO_DATA[index];
+      selectedHero = hero.id;
+
+      document.querySelectorAll('.roster-icon').forEach(el => el.classList.remove('selected'));
+      document.getElementById('roster-icon-' + index).classList.add('selected');
+
+      document.getElementById('showcase-img').src = hero.img;
+      document.getElementById('showcase-name').innerText = hero.name;
+      document.getElementById('showcase-desc').innerText = hero.desc;
+      
+      document.getElementById('bar-hp').style.width = '0%';
+      document.getElementById('bar-atk').style.width = '0%';
+      document.getElementById('bar-spd').style.width = '0%';
+
+      setTimeout(() => {
+        document.getElementById('bar-hp').style.width = hero.hp + '%';
+        document.getElementById('bar-atk').style.width = hero.atk + '%';
+        document.getElementById('bar-spd').style.width = hero.spd + '%';
+      }, 50);
+
       document.getElementById('btnEnterDungeon').disabled = false;
-      localStorage.setItem('hero', hero);
+      localStorage.setItem('hero', hero.id);
+    }
+
+    function cycleHero(dir) {
+      selectHeroByIndex(selectedHeroIndex + dir);
+    }
+
+    // Call init when panel is shown
+    function showHeroSelect() {
+      if (!selectedMode) return;
+      document.getElementById('modePanel').classList.add('hidden');
+      document.getElementById('heroPanel').classList.remove('hidden');
+      if (document.getElementById('roster-grid').children.length === 0) {
+        initHeroRoster();
+      }
     }
     function enterDungeon() {
       if (!selectedHero || !selectedMode) return;
@@ -381,13 +376,13 @@
         window.addEventListener('click', startMusic);
       });
       // play a small UI click on menu buttons
-      document.querySelectorAll('#mainMenu button, .sk-panel button, .hero-card').forEach(b=>{
+      document.querySelectorAll('#mainMenu button, .sk-panel button, .hero-card, .ui-flat-slot, .ui-flat-diff-card').forEach(b=>{
         b.addEventListener('click', ()=>{ try { const c = new Audio('/static/Sounds/UI/select_1.wav'); c.volume=0.9; c.play().catch(()=>{}); } catch(e){} });
       });
 
       // Trigger entrance animation for floating actions
       try {
-        const fa = document.querySelector('.floating-actions');
+        const fa = document.querySelector('.sidebar-nav');
         if (fa) setTimeout(() => fa.classList.add('entrance'), 160);
       } catch (e) { /* ignore */ }
     </script>

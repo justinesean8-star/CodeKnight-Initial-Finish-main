@@ -1,0 +1,205 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Pixel font import */
+@font-face {
+  font-family: 'PixelFont';
+  src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Dark pixel game palette */
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.95 0.01 100);
+  --card: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.95 0.01 100);
+  --popover: oklch(0.15 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 100);
+  /* Primary - Golden/Yellow accent */
+  --primary: oklch(0.82 0.18 85);
+  --primary-foreground: oklch(0.15 0.02 260);
+  /* Secondary - Teal/Cyan */
+  --secondary: oklch(0.65 0.15 195);
+  --secondary-foreground: oklch(0.12 0.02 260);
+  --muted: oklch(0.25 0.02 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  /* Accent - Warm orange */
+  --accent: oklch(0.72 0.18 50);
+  --accent-foreground: oklch(0.12 0.02 260);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.95 0.01 100);
+  --border: oklch(0.35 0.03 260);
+  --input: oklch(0.22 0.02 260);
+  --ring: oklch(0.82 0.18 85);
+  /* Chart colors for skill tree / stats */
+  --chart-1: oklch(0.72 0.18 50);
+  --chart-2: oklch(0.65 0.15 195);
+  --chart-3: oklch(0.75 0.16 140);
+  --chart-4: oklch(0.82 0.18 85);
+  --chart-5: oklch(0.60 0.20 320);
+  --radius: 0px;
+  /* Pixel panel colors */
+  --pixel-dark: oklch(0.08 0.02 260);
+  --pixel-light: oklch(0.45 0.03 260);
+  --pixel-highlight: oklch(0.55 0.03 260);
+  --pixel-gold: oklch(0.82 0.18 85);
+  --pixel-green: oklch(0.65 0.18 145);
+  --pixel-red: oklch(0.55 0.22 25);
+}
+
+@theme inline {
+  --font-sans: 'PixelFont', 'Press Start 2P', monospace;
+  --font-mono: 'PixelFont', 'Press Start 2P', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --color-pixel-dark: var(--pixel-dark);
+  --color-pixel-light: var(--pixel-light);
+  --color-pixel-highlight: var(--pixel-highlight);
+  --color-pixel-gold: var(--pixel-gold);
+  --color-pixel-green: var(--pixel-green);
+  --color-pixel-red: var(--pixel-red);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    image-rendering: pixelated;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Pixel art button styles */
+.pixel-btn {
+  position: relative;
+  image-rendering: pixelated;
+  transition: transform 0.05s ease;
+  box-shadow: 
+    inset -4px -4px 0px 0px var(--pixel-dark),
+    inset 4px 4px 0px 0px var(--pixel-highlight);
+}
+
+.pixel-btn:hover {
+  filter: brightness(1.1);
+}
+
+.pixel-btn:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 4px 4px 0px 0px var(--pixel-dark),
+    inset -4px -4px 0px 0px var(--pixel-highlight);
+}
+
+/* Pixel panel with 3D border effect */
+.pixel-panel {
+  position: relative;
+  box-shadow: 
+    inset -4px -4px 0px 0px var(--pixel-dark),
+    inset 4px 4px 0px 0px var(--pixel-highlight),
+    8px 8px 0px 0px var(--pixel-dark);
+}
+
+.pixel-panel-inset {
+  box-shadow: 
+    inset 4px 4px 0px 0px var(--pixel-dark),
+    inset -4px -4px 0px 0px var(--pixel-highlight);
+}
+
+/* Scanline effect */
+.scanlines {
+  position: relative;
+}
+
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+/* CRT glow effect */
+.crt-glow {
+  text-shadow: 
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 40px currentColor;
+}
+
+/* Pixel border animation */
+@keyframes pixel-pulse {
+  0%, 100% {
+    box-shadow: 
+      inset -4px -4px 0px 0px var(--pixel-dark),
+      inset 4px 4px 0px 0px var(--pixel-highlight),
+      0 0 0 2px var(--pixel-gold);
+  }
+  50% {
+    box-shadow: 
+      inset -4px -4px 0px 0px var(--pixel-dark),
+      inset 4px 4px 0px 0px var(--pixel-highlight),
+      0 0 0 4px var(--pixel-gold);
+  }
+}
+
+.pixel-pulse {
+  animation: pixel-pulse 1.5s ease-in-out infinite;
+}
+
+/* Blinking cursor effect */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Float animation for icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.pixel-float {
+  animation: float 2s ease-in-out infinite;
+}

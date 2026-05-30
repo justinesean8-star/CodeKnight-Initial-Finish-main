@@ -3,7 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from flask import Flask, render_template, request, jsonify, session, redirect
+from flask import Flask, render_template, request, jsonify, session, redirect, send_from_directory
 import json
 import random
 import time
@@ -105,6 +105,16 @@ def register_page():
 def dashboard():
     user = session.get("user")
     return render_template("dashboard.html", user=user)
+
+
+@app.route('/ck-assets/<path:filename>')
+def ck_assets(filename):
+    """Serve Codedknight NEW UI public assets without copying them.
+    This keeps the original asset files in the attached folder and
+    exposes them under /ck-assets/<filename> for the Flask app.
+    """
+    public_dir = os.path.join(os.path.dirname(__file__), 'Codedknight NEW UI', 'public')
+    return send_from_directory(public_dir, filename)
 
 
 @app.route("/api/register", methods=["POST"])
